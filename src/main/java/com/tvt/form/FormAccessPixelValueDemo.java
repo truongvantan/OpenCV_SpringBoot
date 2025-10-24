@@ -7,8 +7,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -16,34 +18,37 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.tvt.common.ComponentSettingCommon;
 import com.tvt.common.ImageCommonHandle;
 import com.tvt.config.AppConfiguration;
 
-import jnafilechooser.api.JnaFileChooser;
-
 @Component
 public class FormAccessPixelValueDemo extends JFrame {
-	
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private final AppConfiguration appConfiguration;
-	
+
 //	@Value("${init.current.directory.file.chooser}")
 //	private String INIT_CURRENT_DIRECTORY_FILE_CHOOSER;
-	
+
 	private ImageCommonHandle imageCommonHandle = new ImageCommonHandle();
+	private ComponentSettingCommon componentSettingCommon = new ComponentSettingCommon();
+
 	private JPanel contentPane;
 	private JButton btnLoadImage;
 	private JList<String> listImage;
@@ -57,21 +62,29 @@ public class FormAccessPixelValueDemo extends JFrame {
 	private JLabel lbOutputImage;
 	private JButton btnClear;
 
-
 //	public FormAccessPixelValueDemo() {
 //		initComponent();
 //	}
-	
-	
+
 	@Autowired
 	public FormAccessPixelValueDemo(AppConfiguration appConfiguration) throws HeadlessException {
 		this.appConfiguration = appConfiguration;
 		initComponent();
 	}
 
-
-
 	private void initComponent() {
+		try {
+			UIManager.setLookAndFeel(appConfiguration.getUILookAndFeel());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
+
 		this.setTitle("Access Pixel Value Demo");
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setBounds(100, 100, 1439, 737);
@@ -127,9 +140,9 @@ public class FormAccessPixelValueDemo extends JFrame {
 		lbOutputImage.setFont(new Font("Tahoma", Font.BOLD, 13));
 		lbOutputImage.setBounds(923, 23, 95, 14);
 		contentPane.add(lbOutputImage);
-		
+
 		btnClear = new JButton("Clear");
-		
+
 		btnClear.setBorderPainted(false);
 		btnClear.setForeground(new Color(255, 255, 255));
 		btnClear.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -144,31 +157,23 @@ public class FormAccessPixelValueDemo extends JFrame {
 		btnLoadImage_Click();
 		listImage_ValueChanged();
 		btnClear_Click();
-		
+
 	}
-	
-	private void btnClear_Click()
-	{
-//		btnClear.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				listImage.removeListSelectionListener();
-//				listModel.removeAllElements();
-//			}
-//		});
+
+	private void btnClear_Click() {
 	}
 
 	private void btnLoadImage_Click() {
 		btnLoadImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JnaFileChooser fileChooser = new JnaFileChooser();
-				fileChooser.setMultiSelectionEnabled(true);
-//				fileChooser.setCurrentDirectory("D:\\Tan\\Sample_Data\\");
-//				fileChooser.setCurrentDirectory(INIT_CURRENT_DIRECTORY_FILE_CHOOSER);
-				fileChooser.setCurrentDirectory(appConfiguration.getInitCurrentDirectoryFileChooser());
-				fileChooser.addFilter("Image Files", "gif", "jpg", "png", "webp", "tif", "bmp");
-				fileChooser.addFilter("All files", "*.*");
+				FileFilter imageFileFilter = new FileNameExtensionFilter("Image files",
+						ImageIO.getReaderFileSuffixes());
+				JFileChooser fileChooser = new JFileChooser();
+				componentSettingCommon.settingJFileChooser(fileChooser, "Please select your images",
+						JFileChooser.FILES_ONLY, true, imageFileFilter,
+						appConfiguration.getInitCurrentDirectoryFileChooser());
 
-				if (fileChooser.showOpenDialog(getOwner())) {
+				if (fileChooser.showOpenDialog(getOwner()) == JFileChooser.APPROVE_OPTION) {
 					File[] selectedFiles = fileChooser.getSelectedFiles();
 					for (File file : selectedFiles) {
 						listModel.addElement(file.getAbsolutePath());
@@ -194,14 +199,15 @@ public class FormAccessPixelValueDemo extends JFrame {
 
 	private void processImage(String pathImageSelected) {
 		Mat input = Imgcodecs.imread(pathImageSelected, Imgcodecs.IMREAD_COLOR);
-		
+
 		if (input.empty()) {
-			JOptionPane.showMessageDialog(null, "Cannot open image: " + pathImageSelected, "WARNING", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Cannot open image: " + pathImageSelected, "WARNING",
+					JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 
 		Mat output = new Mat(input.rows(), input.cols(), input.type());
-		
+
 		int rows = input.rows();
 		int cols = input.cols();
 		int channels = input.channels();
@@ -212,7 +218,7 @@ public class FormAccessPixelValueDemo extends JFrame {
 		for (int y = 0; y < rows; y++) {
 			for (int x = 0; x < cols; x++) {
 				pixel = input.get(y, x);
-				
+
 				if (pixel != null) {
 					for (int c = 0; c < channels; c++) {
 //						newPixel[c] = Math.abs(pixel[c] - 255.0);
@@ -228,9 +234,9 @@ public class FormAccessPixelValueDemo extends JFrame {
 				}
 			}
 		}
-		
+
 		imageCommonHandle.loadCVMatToLabel(output, lbLoadOutputImage, panelOutputImage);
-		
+
 		input.release();
 		output.release();
 

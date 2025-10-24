@@ -31,4 +31,8 @@ public class AppConfiguration {
 	public String getInitCurrentDirectoryFileChooser() {
 		return env.getProperty("init.current.directory.file.chooser");
 	}
+	
+	public String getUILookAndFeel() {
+		return env.getProperty("ui.look.and.feel");
+	}
 }

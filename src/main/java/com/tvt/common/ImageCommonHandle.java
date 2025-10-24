@@ -17,6 +17,9 @@ import org.opencv.core.Mat;
 import org.opencv.highgui.HighGui;
 
 public class ImageCommonHandle {
+	
+	public ImageCommonHandle() {
+	}
 
 	public void loadImageToPanel(ImageIcon imageIcon, JPanel panel) {
 		panel.removeAll();

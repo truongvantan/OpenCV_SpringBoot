@@ -7,11 +7,14 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+import javax.swing.UIManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.tvt.config.AppConfiguration;
 import com.tvt.form.MainForm;
 
 @SpringBootApplication
@@ -35,9 +38,13 @@ public class OpenCvSpringBootApplication implements CommandLineRunner {
     
     @Autowired
     private MainForm mainForm;
+    
+    @Autowired
+    private AppConfiguration appConfiguration;
 	
 	public static void main(String[] args) {
 		System.setProperty("java.awt.headless", "false");
+		
 		SpringApplication.run(OpenCvSpringBootApplication.class, args);
 	}
 
@@ -46,6 +53,7 @@ public class OpenCvSpringBootApplication implements CommandLineRunner {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					UIManager.setLookAndFeel(appConfiguration.getUILookAndFeel());
 					mainForm.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();

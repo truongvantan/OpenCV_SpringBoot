@@ -12,8 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -21,19 +23,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.tvt.common.ComponentSettingCommon;
 import com.tvt.common.ImageCommonHandle;
 import com.tvt.config.AppConfiguration;
-
-import jnafilechooser.api.JnaFileChooser;
 
 @Component
 public class FormExtractEmbeddedImage extends JFrame {
@@ -52,6 +56,8 @@ public class FormExtractEmbeddedImage extends JFrame {
 //	private String INIT_CURRENT_DIRECTORY_FILE_CHOOSER;
 	
 	private ImageCommonHandle imageCommonHandle = new ImageCommonHandle();
+	private ComponentSettingCommon componentSettingCommon = new ComponentSettingCommon();
+	
 	private JPanel contentPane;
 	private JButton btnLoadImage;
 	private JList<String> listImage;
@@ -67,7 +73,8 @@ public class FormExtractEmbeddedImage extends JFrame {
 	private JLabel lbLocationThermalImageValue;
 	private JLabel lbLocationEmbeddedImage;
 	private JLabel lbLocationEmbeddedImageValue;
-	private JnaFileChooser fileChooser;
+//	private JnaFileChooser fileChooser;
+	private JFileChooser jFileChooser;
 	
 //	public FormExtractEmbeddedImage() {
 //		initComponent();
@@ -83,6 +90,17 @@ public class FormExtractEmbeddedImage extends JFrame {
 
 
 	private void initComponent() {
+		try {
+			UIManager.setLookAndFeel(appConfiguration.getUILookAndFeel());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
 		this.setTitle("Extract Embedded Image");
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setBounds(100, 100, 1822, 737);
@@ -163,15 +181,18 @@ public class FormExtractEmbeddedImage extends JFrame {
 		contentPane.add(lbLocationEmbeddedImageValue);
 		
 		// file chooser
-		fileChooser = new JnaFileChooser();
-		fileChooser.setMultiSelectionEnabled(true);
-//		fileChooser.setCurrentDirectory("D:\\Tan\\Sample_Data\\");
-//		fileChooser.setCurrentDirectory(INIT_CURRENT_DIRECTORY_FILE_CHOOSER);
-		fileChooser.setCurrentDirectory(appConfiguration.getInitCurrentDirectoryFileChooser());
-		fileChooser.addFilter("Image Files", "gif", "jpg", "png", "webp", "tif", "bmp");
-		fileChooser.addFilter("All files", "*.*");
+		jFileChooser = new JFileChooser();
+		settingJFileChooser(jFileChooser);
 		
 		handleEvent();
+	}
+	
+
+	private void settingJFileChooser(JFileChooser fileChooser) {
+		FileFilter imageFileFilter = new FileNameExtensionFilter("Image files", ImageIO.getReaderFileSuffixes());
+		componentSettingCommon.settingJFileChooser(fileChooser, "Please select your images",
+				JFileChooser.FILES_ONLY, true, imageFileFilter,
+				appConfiguration.getInitCurrentDirectoryFileChooser());
 	}
 
 	private void handleEvent() {
@@ -210,8 +231,8 @@ public class FormExtractEmbeddedImage extends JFrame {
 	private void btnLoadImage_Click() {
 		btnLoadImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (fileChooser.showOpenDialog(getOwner())) {
-					File[] selectedFiles = fileChooser.getSelectedFiles();
+				if (jFileChooser.showOpenDialog(getOwner()) == JFileChooser.APPROVE_OPTION) {
+					File[] selectedFiles = jFileChooser.getSelectedFiles();
 					for (File file : selectedFiles) {
 						listModel.addElement(file.getAbsolutePath());
 					}

@@ -1,4 +1,4 @@
-package com.tvt.form;
+package com.tvt.form.image_processing;
 
 import java.awt.Color;
 import java.awt.Font;

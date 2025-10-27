@@ -1,6 +1,7 @@
 package com.tvt.form.image_processing;
 
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,10 +33,10 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.opencv.core.Core;
-import org.opencv.core.Core.MinMaxLocResult;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -47,6 +48,7 @@ import com.tvt.common.ComponentSettingCommon;
 import com.tvt.common.Constant;
 import com.tvt.common.FlirMetadataParam;
 import com.tvt.common.ImageCommonHandle;
+import com.tvt.component.ImageLabelWithCircles;
 import com.tvt.config.AppConfiguration;
 import com.tvt.service.FileService;
 
@@ -81,7 +83,10 @@ public class FormExtractEmbeddedImage extends JFrame {
 	private JScrollPane scrollPane;
 	private JPanel panelInputImage;
 	private JLabel lbThermalImage;
-	private JLabel lbLoadInputImage;
+
+//	private JLabel lbLoadInputImage;
+	private ImageLabelWithCircles lbLoadInputImage;
+
 	private JPanel panelOutputImage;
 	private JLabel lbLoadOutputImage;
 	private JLabel lbOutputImage;
@@ -159,7 +164,8 @@ public class FormExtractEmbeddedImage extends JFrame {
 		contentPane.add(panelInputImage);
 		panelInputImage.setLayout(null);
 
-		lbLoadInputImage = new JLabel("");
+//		lbLoadInputImage = new JLabel("");
+		lbLoadInputImage = new ImageLabelWithCircles();
 		lbLoadInputImage.setBounds(0, 0, 464, 348);
 		panelInputImage.add(lbLoadInputImage);
 
@@ -364,32 +370,119 @@ public class FormExtractEmbeddedImage extends JFrame {
 				// extract metadata of thermal image
 				extractMetadataOfThermalImage(pathImageSelected);
 
+				// read metadata parameter
+				String metadataFilePath = fileService.getOutputFilePath(pathImageSelected, "metadata.txt");
+				mapMetadataParams = fileService.readFlirMetadataParams(metadataFilePath);
+
 				// extract embedded image of thermal image
 				extractEmbeddedImageOfThermalImage(pathImageSelected);
 
 				// extract raw thermal image
 				extractRawThermalImageOfThermalImage(pathImageSelected);
 
-				// Show extracted embedded image
-				showEmbeddedImage(pathImageSelected);
-
-				// read metadata parameter
-				String metadataFilePath = fileService.getOutputFilePath(pathImageSelected, "metadata.txt");
-
-				mapMetadataParams = fileService.readFlirMetadataParams(metadataFilePath);
-
 				// get temperature map of raw thermal image
 				temperatureMap = getTemperatureMap(mapMetadataParams);
+
+				// load color thermal image color to label
+//				imageCommonHandle.loadImageToLabel(pathImageSelected, lbLoadInputImage, panelInputImage);
+				imageCommonHandle.loadImageToLabel2(pathImageSelected, lbLoadInputImage, panelInputImage);
+				lbLocationThermalImageValue.setVisible(true);
 
 				// get max, min temperature of raw thermal image
 				displayMinMaxTemperature();
 
-				// load color thermal image color to label
-				imageCommonHandle.loadImageToLabel(pathImageSelected, lbLoadInputImage, panelInputImage);
-				lbLocationThermalImageValue.setVisible(true);
+				// show extracted embedded image
+//				showEmbeddedImage(pathImageSelected);
+
+				// show vision image
+				showVisionImage(pathImageSelected, mapMetadataParams);
 			}
 
 		});
+	}
+
+	private void showVisionImage(String pathImageSelected, Map<String, String> mapMetadataParams) {
+		String embeddedImagePath = fileService.getOutputFilePath(pathImageSelected, "embedded.png");
+		try {
+			File embeddedFile = new File(embeddedImagePath);
+
+			if (embeddedFile.exists() && embeddedFile.length() > 0) {
+				Mat matEmbeddedImage = Imgcodecs.imread(embeddedImagePath, Imgcodecs.IMREAD_UNCHANGED);
+				Mat matVisionImage = getMatVisionImage(matEmbeddedImage, mapMetadataParams);
+				
+				imageCommonHandle.loadCVMatToLabel(matVisionImage, lbLoadOutputImage, panelOutputImage);
+				String visionImagePath = fileService.getOutputFilePath(pathImageSelected, "vision.png");
+				Imgcodecs.imwrite(visionImagePath, matVisionImage);
+			}
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Cannot extract embedded image: " + pathImageSelected, "WARNING",
+					JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		lbLocationEmbeddedImageValue.setVisible(true);
+	}
+
+	private Mat getMatVisionImage(Mat matEmbeddedImage, Map<String, String> mapMetadataParams2) {
+		// get metadata parameter from metadata file
+		flirMetadataParam = commonParseValue.parseMetadata(mapMetadataParams);
+		double real2IR = flirMetadataParam.getReal2IR();
+		double offsetX = flirMetadataParam.getOffsetX();
+		double offsetY = flirMetadataParam.getOffsetY();
+		double pipX1 = flirMetadataParam.getPipX1();
+		double pipX2 = flirMetadataParam.getPipX2();
+		double pipY1 = flirMetadataParam.getPipY1();
+		double pipY2 = flirMetadataParam.getPipY2();
+		double rawThermalImageWidth = flirMetadataParam.getRawThermalImageWidth();
+		double rawThermalImageHeight = flirMetadataParam.getRawThermalImageHeight();
+
+		Mat imgScaled = new Mat((int) (matEmbeddedImage.rows() * real2IR), (int) (matEmbeddedImage.cols() * real2IR),
+				matEmbeddedImage.type());
+		Imgproc.resize(matEmbeddedImage, imgScaled, imgScaled.size(), 0, 0, Imgproc.INTER_LINEAR);
+		int width = (int) matEmbeddedImage.size().width;
+		int height = (int) matEmbeddedImage.size().height;
+
+		int widthScale = (int) imgScaled.size().width;
+		int heightScale = (int) imgScaled.size().height;
+		int cx = (int) (widthScale / 2 + offsetX * real2IR);
+		int cy = (int) (heightScale / 2 + offsetY * real2IR);
+
+		if (cy < height / 2) {
+			cy = height / 2;
+		}
+
+		if (cx < width / 2) {
+			cx = width / 2;
+		}
+
+		// Prevent negative crop end coordinates
+		if (cy + height / 2 < 0) {
+			cy = -(height / 2);
+		}
+		if (cx + width / 2 < 0) {
+			cx = -(width / 2);
+		}
+
+		// Crop region of interest (ROI)
+		int y1 = cy - height / 2;
+		int y2 = cy + height / 2;
+		int x1 = cx - width / 2;
+		int x2 = cx + width / 2;
+
+		// Ensure ROI inside bounds
+		y1 = Math.max(0, Math.min(y1, heightScale - 1));
+		y2 = Math.max(0, Math.min(y2, heightScale));
+		x1 = Math.max(0, Math.min(x1, widthScale - 1));
+		x2 = Math.max(0, Math.min(x2, widthScale));
+
+		Rect roi = new Rect(x1, y1, x2 - x1, y2 - y1);
+		Mat imgCropped = new Mat(imgScaled, roi);
+
+		// Resize cropped image to final vision size
+		Mat imgVision = new Mat((int) rawThermalImageHeight, (int) rawThermalImageWidth, matEmbeddedImage.type());
+		Imgproc.resize(imgCropped, imgVision, imgVision.size(), 0, 0, Imgproc.INTER_LINEAR);
+
+		return imgVision;
 	}
 
 	private void extractRawThermalImageOfThermalImage(String pathImageSelected) {
@@ -594,34 +687,46 @@ public class FormExtractEmbeddedImage extends JFrame {
 
 		double emissWind = 1 - irWindowTransmission;
 		double reflectWind = 0;
-		double h2o = (relativeHumidity / 100) * Math
-				.exp(1.5587 + 0.06939 * atmosphericTemperature - 0.00027816 * Math.sqrt(atmosphericTemperature) + 0.00000068455 * Math.pow(atmosphericTemperature, 3));
-		double tau1 = atmosphericTransX * Math.exp(-Math.sqrt(objectDistance / 2) * (atmosphericTransAlpha1 + atmosphericTransBeta1 * Math.sqrt(h2o)))
-				+ (1 - atmosphericTransX) * Math.exp(-Math.sqrt(objectDistance / 2) * (atmosphericTransAlpha2 + atmosphericTransBeta2 * Math.sqrt(h2o)));
-		double tau2 = atmosphericTransX * Math.exp(-Math.sqrt(objectDistance / 2) * (atmosphericTransAlpha1 + atmosphericTransBeta1 * Math.sqrt(h2o)))
-				+ (1 - atmosphericTransX) * Math.exp(-Math.sqrt(objectDistance / 2) * (atmosphericTransAlpha2 + atmosphericTransBeta2 * Math.sqrt(h2o)));
+		double h2o = (relativeHumidity / 100) * Math.exp(1.5587 + 0.06939 * atmosphericTemperature
+				- 0.00027816 * Math.sqrt(atmosphericTemperature) + 0.00000068455 * Math.pow(atmosphericTemperature, 3));
+		double tau1 = atmosphericTransX
+				* Math.exp(-Math.sqrt(objectDistance / 2)
+						* (atmosphericTransAlpha1 + atmosphericTransBeta1 * Math.sqrt(h2o)))
+				+ (1 - atmosphericTransX) * Math.exp(-Math.sqrt(objectDistance / 2)
+						* (atmosphericTransAlpha2 + atmosphericTransBeta2 * Math.sqrt(h2o)));
+		double tau2 = atmosphericTransX
+				* Math.exp(-Math.sqrt(objectDistance / 2)
+						* (atmosphericTransAlpha1 + atmosphericTransBeta1 * Math.sqrt(h2o)))
+				+ (1 - atmosphericTransX) * Math.exp(-Math.sqrt(objectDistance / 2)
+						* (atmosphericTransAlpha2 + atmosphericTransBeta2 * Math.sqrt(h2o)));
 
 		// radiance reflecting off the object before the window
-		double rawRefl1 = planckR1 / (planckR2 * (Math.exp(planckB / (reflectedApparentTemperature + 273.15)) - planckF)) - planckO;
-		
-		// attn = the attenuated radiance(in raw units). Infrared radiation is attenuated by the atmosphere
+		double rawRefl1 = planckR1
+				/ (planckR2 * (Math.exp(planckB / (reflectedApparentTemperature + 273.15)) - planckF)) - planckO;
+
+		// attn = the attenuated radiance(in raw units). Infrared radiation is
+		// attenuated by the atmosphere
 		double rawRefl1Attn = (1 - emissivity) / emissivity * rawRefl1;
-		
+
 		// radiance from the atmosphere (before the window)
-		double rawAtm1 = planckR1 / (planckR2 * (Math.exp(planckB / (atmosphericTemperature + 273.15)) - planckF)) - planckO;
+		double rawAtm1 = planckR1 / (planckR2 * (Math.exp(planckB / (atmosphericTemperature + 273.15)) - planckF))
+				- planckO;
 		double rawAtm1Attn = (1 - tau1) / emissivity / tau1 * rawAtm1; // attn = the attenuated radiance(in raw units)
 
-		double rawWind = planckR1 / (planckR2 * (Math.exp(planckB / (irWindowTemperature + 273.15)) - planckF)) - planckO;
+		double rawWind = planckR1 / (planckR2 * (Math.exp(planckB / (irWindowTemperature + 273.15)) - planckF))
+				- planckO;
 		double rawWindAttn = emissWind / emissivity / tau1 / irWindowTransmission * rawWind;
 
-		double rawRefl2 = planckR1 / (planckR2 * (Math.exp(planckB / (reflectedApparentTemperature + 273.15)) - planckF)) - planckO;
+		double rawRefl2 = planckR1
+				/ (planckR2 * (Math.exp(planckB / (reflectedApparentTemperature + 273.15)) - planckF)) - planckO;
 		double rawRefl2Attn = reflectWind / emissivity / tau1 / irWindowTransmission * rawRefl2;
 
-		double rawAtm2 = planckR1 / (planckR2 * (Math.exp(planckB / (atmosphericTemperature + 273.15)) - planckF)) - planckO;
+		double rawAtm2 = planckR1 / (planckR2 * (Math.exp(planckB / (atmosphericTemperature + 273.15)) - planckF))
+				- planckO;
 		double rawAtm2Attn = (1 - tau2) / emissivity / tau1 / irWindowTransmission / tau2 * rawAtm2;
 
-		double rawObj = (rawVal / emissivity / tau1 / irWindowTransmission / tau2 - rawAtm1Attn - rawAtm2Attn - rawWindAttn
-				- rawRefl1Attn - rawRefl2Attn);
+		double rawObj = (rawVal / emissivity / tau1 / irWindowTransmission / tau2 - rawAtm1Attn - rawAtm2Attn
+				- rawWindAttn - rawRefl1Attn - rawRefl2Attn);
 
 		double tempCelsius = planckB / Math.log(planckR1 / (planckR2 * (rawObj + planckO)) + planckF) - 273.15;
 
@@ -656,6 +761,10 @@ public class FormExtractEmbeddedImage extends JFrame {
 
 		lbLocationMaxTemperatureValue.setText(locationMaxTemperature);
 		lbLocationMinTemperatureValue.setText(locationMinTemperature);
+
+		lbLoadInputImage.setTemperaturePoints(xLocationMaxTemperature, yLocationMaxTemperature, xLocationMinTemperature,
+				yLocationMinTemperature);
 	}
+
 
 }

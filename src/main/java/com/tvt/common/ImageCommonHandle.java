@@ -16,8 +16,10 @@ import javax.swing.UIManager;
 import org.opencv.core.Mat;
 import org.opencv.highgui.HighGui;
 
+import com.tvt.component.ImageLabelWithCircles;
+
 public class ImageCommonHandle {
-	
+
 	public ImageCommonHandle() {
 	}
 
@@ -29,46 +31,64 @@ public class ImageCommonHandle {
 
 	public void loadImageToLabel(String imagePath, JLabel labelLoadImage, JPanel panelLoadImage) {
 		BufferedImage bufferedImage = null;
-		ImageIcon imageIcon = null;;
-		
+		ImageIcon imageIcon = null;
+
 		try {
 			bufferedImage = ImageIO.read(new File(imagePath));
 		} catch (IOException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Cannot open image: " + imagePath, "WARNING", JOptionPane.WARNING_MESSAGE);
-			imageIcon = (ImageIcon)UIManager.getIcon("OptionPane.errorIcon");
-//			return;
+			JOptionPane.showMessageDialog(null, "Cannot open image: " + imagePath, "WARNING",
+					JOptionPane.WARNING_MESSAGE);
+			imageIcon = (ImageIcon) UIManager.getIcon("OptionPane.errorIcon");
 		}
-		
+
 		try {
 			imageIcon = new ImageIcon(bufferedImage);
 		} catch (Exception e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Cannot open image: " + imagePath, "WARNING", JOptionPane.WARNING_MESSAGE);
-			imageIcon = (ImageIcon)UIManager.getIcon("OptionPane.errorIcon");
+			JOptionPane.showMessageDialog(null, "Cannot open image: " + imagePath, "WARNING",
+					JOptionPane.WARNING_MESSAGE);
+			imageIcon = (ImageIcon) UIManager.getIcon("OptionPane.errorIcon");
 		}
 
-
 		if (imageIcon == null || imageIcon.getImageLoadStatus() == MediaTracker.ERRORED) {
-			JOptionPane.showMessageDialog(null, "Cannot open image: " + imagePath, "WARNING", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Cannot open image: " + imagePath, "WARNING",
+					JOptionPane.WARNING_MESSAGE);
 		} else {
-			imageIcon.setImage(imageIcon.getImage().getScaledInstance(panelLoadImage.getWidth(), panelLoadImage.getHeight(), Image.SCALE_SMOOTH));
+			imageIcon.setImage(imageIcon.getImage().getScaledInstance(panelLoadImage.getWidth(),
+					panelLoadImage.getHeight(), Image.SCALE_SMOOTH));
 			labelLoadImage.setIcon(imageIcon);
 		}
 	}
 
 	public void loadCVMatToLabel(Mat mat, JLabel labelLoadImage, JPanel panelLoadImage) {
 		BufferedImage bufferedImage = (BufferedImage) HighGui.toBufferedImage(mat);
-		
-		ImageIcon imageIcon = new ImageIcon(bufferedImage);
 
+		ImageIcon imageIcon = new ImageIcon(bufferedImage);
 
 		if (imageIcon.getImageLoadStatus() == MediaTracker.ERRORED) {
 			JOptionPane.showMessageDialog(null, "Cannot load CV Mat image", "WARNING", JOptionPane.WARNING_MESSAGE);
 		} else {
-			imageIcon.setImage(imageIcon.getImage().getScaledInstance(panelLoadImage.getWidth(), panelLoadImage.getHeight(), Image.SCALE_SMOOTH));
+			imageIcon.setImage(imageIcon.getImage().getScaledInstance(panelLoadImage.getWidth(),
+					panelLoadImage.getHeight(), Image.SCALE_SMOOTH));
 			labelLoadImage.setIcon(imageIcon);
 		}
 	}
 	
+	public void loadImageToLabel2(String imagePath, ImageLabelWithCircles labelLoadImage, JPanel panelLoadImage) {
+	    try {
+	        BufferedImage bufferedImage = ImageIO.read(new File(imagePath));
+	        if (bufferedImage == null) {
+	            JOptionPane.showMessageDialog(null, "Cannot open image: " + imagePath, "WARNING", JOptionPane.WARNING_MESSAGE);
+	            return;
+	        }
+
+	        Image scaled = bufferedImage.getScaledInstance(panelLoadImage.getWidth(), panelLoadImage.getHeight(), Image.SCALE_SMOOTH);
+	        labelLoadImage.setIcon(new ImageIcon(scaled));
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        JOptionPane.showMessageDialog(null, "Cannot open image: " + imagePath, "WARNING", JOptionPane.WARNING_MESSAGE);
+	    }
+	}
+
 }

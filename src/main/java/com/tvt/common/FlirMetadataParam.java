@@ -6,13 +6,24 @@ public class FlirMetadataParam {
 	private double objectDistance = 1.0;
 	private double atmosphericTemperature = 23.0, reflectedApparentTemperature = 20.0, relativeHumidity = 50.0;
 	private double irWindowTemperature = 20.0, irWindowTransmission = 1.0;
-	private double atmosphericTransAlpha1, atmosphericTransAlpha2, atmosphericTransBeta1 = 0.003180, atmosphericTransBeta2 = 0.003180, atmosphericTransX = 0.732000;
+	private double atmosphericTransAlpha1, atmosphericTransAlpha2, atmosphericTransBeta1 = 0.003180,
+			atmosphericTransBeta2 = 0.003180, atmosphericTransX = 0.732000;
 	private double tau, R;
 
 	private double cameraTemperatureRangeMin = -20.0;
 	private double cameraTemperatureRangeMax = 120.0;
 	private double rawValueRangeMin = 5926.0;
 	private double rawValueRangeMax = 55419.0;
+
+	private double real2IR = 1.3206022977829;
+	private double offsetX = 0.0;
+	private double offsetY = 0.0;
+	private double pipX1 = 0.0;
+	private double pipX2 = 1024.0;
+	private double pipY1 = 0;
+	private double pipY2 = 768;
+	private double rawThermalImageWidth = 464.0;
+	private double rawThermalImageHeight = 348.0;
 
 	public FlirMetadataParam() {
 	}
@@ -201,6 +212,78 @@ public class FlirMetadataParam {
 		this.rawValueRangeMax = rawValueRangeMax;
 	}
 
+	public double getReal2IR() {
+		return real2IR;
+	}
+
+	public void setReal2IR(double real2ir) {
+		real2IR = real2ir;
+	}
+
+	public double getOffsetX() {
+		return offsetX;
+	}
+
+	public void setOffsetX(double offsetX) {
+		this.offsetX = offsetX;
+	}
+
+	public double getOffsetY() {
+		return offsetY;
+	}
+
+	public void setOffsetY(double offsetY) {
+		this.offsetY = offsetY;
+	}
+
+	public double getPipX1() {
+		return pipX1;
+	}
+
+	public void setPipX1(double pipX1) {
+		this.pipX1 = pipX1;
+	}
+
+	public double getPipX2() {
+		return pipX2;
+	}
+
+	public void setPipX2(double pipX2) {
+		this.pipX2 = pipX2;
+	}
+
+	public double getPipY1() {
+		return pipY1;
+	}
+
+	public void setPipY1(double pipY1) {
+		this.pipY1 = pipY1;
+	}
+
+	public double getPipY2() {
+		return pipY2;
+	}
+
+	public void setPipY2(double pipY2) {
+		this.pipY2 = pipY2;
+	}
+
+	public double getRawThermalImageWidth() {
+		return rawThermalImageWidth;
+	}
+
+	public void setRawThermalImageWidth(double rawThermalImageWidth) {
+		this.rawThermalImageWidth = rawThermalImageWidth;
+	}
+
+	public double getRawThermalImageHeight() {
+		return rawThermalImageHeight;
+	}
+
+	public void setRawThermalImageHeight(double rawThermalImageHeight) {
+		this.rawThermalImageHeight = rawThermalImageHeight;
+	}
+
 	@Override
 	public String toString() {
 		return "FlirMetadataParam [planckR1=" + planckR1 + ", planckB=" + planckB + ", planckF=" + planckF
@@ -213,9 +296,10 @@ public class FlirMetadataParam {
 				+ atmosphericTransBeta1 + ", atmosphericTransBeta2=" + atmosphericTransBeta2 + ", atmosphericTransX="
 				+ atmosphericTransX + ", tau=" + tau + ", R=" + R + ", cameraTemperatureRangeMin="
 				+ cameraTemperatureRangeMin + ", cameraTemperatureRangeMax=" + cameraTemperatureRangeMax
-				+ ", rawValueRangeMin=" + rawValueRangeMin + ", rawValueRangeMax=" + rawValueRangeMax + "]";
+				+ ", rawValueRangeMin=" + rawValueRangeMin + ", rawValueRangeMax=" + rawValueRangeMax + ", real2IR="
+				+ real2IR + ", offsetX=" + offsetX + ", offsetY=" + offsetY + ", pipX1=" + pipX1 + ", pipX2=" + pipX2
+				+ ", pipY1=" + pipY1 + ", pipY2=" + pipY2 + ", rawThermalImageWidth=" + rawThermalImageWidth
+				+ ", rawThermalImageHeight=" + rawThermalImageHeight + "]";
 	}
-
-	
 
 }

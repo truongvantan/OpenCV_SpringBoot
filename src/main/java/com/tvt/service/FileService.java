@@ -44,6 +44,9 @@ public class FileService {
 		case "raw_thermal.png":
 			return new StringBuffer("").append(appConfiguration.getOutputEmbeddedImageFolder()).append("\\")
 					.append(baseName).append("_raw_thermal.png").toString();
+		case "vision.png":
+			return new StringBuffer("").append(appConfiguration.getOutputEmbeddedImageFolder()).append("\\")
+					.append(baseName).append("_vision.png").toString();
 		default:
 			break;
 		}

@@ -36,17 +36,17 @@ public class FileService {
 
 		switch (fileType) {
 		case "metadata.txt":
-			return new StringBuffer("").append(appConfiguration.getOutputEmbeddedImageFolder()).append("\\")
-					.append(baseName).append("_metadata.txt").toString();
+			return new StringBuffer("").append(appConfiguration.getOutputEmbeddedImageFolder()).append("\\").append(baseName).append("_metadata.txt")
+					.toString();
 		case "embedded.png":
-			return new StringBuffer("").append(appConfiguration.getOutputEmbeddedImageFolder()).append("\\")
-					.append(baseName).append("_embedded.png").toString();
+			return new StringBuffer("").append(appConfiguration.getOutputEmbeddedImageFolder()).append("\\").append(baseName).append("_embedded.png")
+					.toString();
 		case "raw_thermal.png":
-			return new StringBuffer("").append(appConfiguration.getOutputEmbeddedImageFolder()).append("\\")
-					.append(baseName).append("_raw_thermal.png").toString();
+			return new StringBuffer("").append(appConfiguration.getOutputEmbeddedImageFolder()).append("\\").append(baseName)
+					.append("_raw_thermal.png").toString();
 		case "vision.png":
-			return new StringBuffer("").append(appConfiguration.getOutputEmbeddedImageFolder()).append("\\")
-					.append(baseName).append("_vision.png").toString();
+			return new StringBuffer("").append(appConfiguration.getOutputEmbeddedImageFolder()).append("\\").append(baseName).append("_vision.png")
+					.toString();
 		default:
 			break;
 		}
@@ -60,8 +60,8 @@ public class FileService {
 		String thermalImageMetaDataPath = getOutputFilePath(pathImageSelected, "metadata.txt");
 		if (thermalImageMetaDataPath != null) {
 			/**
-			 * Extract Metadata of thermal image Example command line:
-			 * exiftool <filename.jpg>
+			 * Extract Metadata of thermal image Example command line: exiftool
+			 * <filename.jpg>
 			 */
 			ProcessBuilder processBuilder1 = new ProcessBuilder("exiftool", pathImageSelected);
 
@@ -99,8 +99,8 @@ public class FileService {
 
 		if (embeddedImagePath != null) {
 			/**
-			 * Run ExifTool to extract embedded image Example command line: 
-			 * exiftool -b -EmbeddedImage input.jpg > output.png
+			 * Run ExifTool to extract embedded image Example command line: exiftool -b
+			 * -EmbeddedImage input.jpg > output.png
 			 */
 			ProcessBuilder pb2 = new ProcessBuilder("exiftool", "-b", "-EmbeddedImage", pathImageSelected);
 
@@ -122,26 +122,25 @@ public class FileService {
 		}
 
 	}
-	
-	public Map<String, String> readFlirMetadataParams(String filePath){
-        Map<String, String> params = new HashMap<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line = null;
-            String[] parts = null;
-            String key = null;
-            String value = null;
-            double val = 0.0;
-            Pattern LINE = Pattern.compile("^([^:]+)\\s*:\\s*(.*)$");
-            Matcher mat = null;
-            
-            while ((line = br.readLine()) != null) {
-            	mat = LINE.matcher(line);
-                if (mat.find()) {
-                	params.put(mat.group(1).trim(), mat.group(2).trim());
-                }
-            	
-            	
+	public Map<String, String> readFlirMetadataParams(String filePath) {
+		Map<String, String> params = new HashMap<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line = null;
+			String[] parts = null;
+			String key = null;
+			String value = null;
+			double val = 0.0;
+			Pattern LINE = Pattern.compile("^([^:]+)\\s*:\\s*(.*)$");
+			Matcher mat = null;
+
+			while ((line = br.readLine()) != null) {
+				mat = LINE.matcher(line);
+				if (mat.find()) {
+					params.put(mat.group(1).trim(), mat.group(2).trim());
+				}
+
 //                parts = line.split(":", 2);
 //                
 //                if (parts.length < 2) {
@@ -158,15 +157,15 @@ public class FileService {
 //                } catch (NumberFormatException e) {
 //                	e.printStackTrace();
 //                }
-            }
-        } catch (FileNotFoundException e1) {
+			}
+		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 
-        return params;
-    }
+		return params;
+	}
 
 	public String extractRawThermalImageFile(String pathImageSelected) {
 		createOuputDirectory();
@@ -174,8 +173,8 @@ public class FileService {
 
 		if (rawThermalImagePath != null) {
 			/**
-			 * Run ExifTool to extract raw thermal image Example command line: 
-			 * exiftool -RawThermalImage -b -w output.png input.jpg
+			 * Run ExifTool to extract raw thermal image Example command line: exiftool
+			 * -RawThermalImage -b -w output.png input.jpg
 			 */
 			ProcessBuilder pb2 = new ProcessBuilder("exiftool", "-RawThermalImage", "-b", pathImageSelected);
 

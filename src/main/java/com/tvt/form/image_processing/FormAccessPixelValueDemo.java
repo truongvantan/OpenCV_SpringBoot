@@ -166,11 +166,9 @@ public class FormAccessPixelValueDemo extends JFrame {
 	private void btnLoadImage_Click() {
 		btnLoadImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				FileFilter imageFileFilter = new FileNameExtensionFilter("Image files",
-						ImageIO.getReaderFileSuffixes());
+				FileFilter imageFileFilter = new FileNameExtensionFilter("Image files", ImageIO.getReaderFileSuffixes());
 				JFileChooser fileChooser = new JFileChooser();
-				componentSettingCommon.settingJFileChooser(fileChooser, "Please select your images",
-						JFileChooser.FILES_ONLY, true, imageFileFilter,
+				componentSettingCommon.settingJFileChooser(fileChooser, "Please select your images", JFileChooser.FILES_ONLY, true, imageFileFilter,
 						appConfiguration.getInitCurrentDirectoryFileChooser());
 
 				if (fileChooser.showOpenDialog(getOwner()) == JFileChooser.APPROVE_OPTION) {
@@ -201,8 +199,7 @@ public class FormAccessPixelValueDemo extends JFrame {
 		Mat input = Imgcodecs.imread(pathImageSelected, Imgcodecs.IMREAD_COLOR);
 
 		if (input.empty()) {
-			JOptionPane.showMessageDialog(null, "Cannot open image: " + pathImageSelected, "WARNING",
-					JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Cannot open image: " + pathImageSelected, "WARNING", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 

@@ -48,18 +48,18 @@ public class MainForm extends JFrame {
 //	public MainForm() {
 //		initComponent();
 //	}
-	
+
 	@Autowired
 	public MainForm(AppConfiguration appConfiguration, FormExtractEmbeddedImage formExtractEmbeddedImage,
-			FormConvertImageExtension formConvertImageExtension, FormAccessPixelValueDemo formAccessPixelValueDemo,
-			FormExcersise2 formExcersise2, FormSVD formSVD) throws HeadlessException {
+			FormConvertImageExtension formConvertImageExtension, FormAccessPixelValueDemo formAccessPixelValueDemo, FormExcersise2 formExcersise2,
+			FormSVD formSVD) throws HeadlessException {
 		this.appConfiguration = appConfiguration;
 		this.formExtractEmbeddedImage = formExtractEmbeddedImage;
 		this.formConvertImageExtension = formConvertImageExtension;
 		this.formAccessPixelValueDemo = formAccessPixelValueDemo;
 		this.formExcersise2 = formExcersise2;
 		this.formSVD = formSVD;
-		
+
 		initComponent();
 	}
 
@@ -103,7 +103,7 @@ public class MainForm extends JFrame {
 
 		menuItemExcersise2 = new JMenuItem("Excersise 2");
 		mnExcersises.add(menuItemExcersise2);
-		
+
 		mntmSVD = new JMenuItem("SVD");
 
 		mnExcersises.add(mntmSVD);

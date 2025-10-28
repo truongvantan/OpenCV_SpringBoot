@@ -123,13 +123,13 @@ public class FormExcersise2 extends JFrame {
 		btnMoveDown.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		btnMoveDown.setBounds(818, 247, 118, 32);
 		contentPane.add(btnMoveDown);
-		
+
 		txtItemValue = new JTextField();
 		txtItemValue.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		txtItemValue.setBounds(148, 451, 164, 23);
 		contentPane.add(txtItemValue);
 		txtItemValue.setColumns(10);
-		
+
 		btnInsert = new JButton("Insert item");
 		btnInsert.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		btnInsert.setBounds(26, 451, 100, 23);
@@ -150,17 +150,16 @@ public class FormExcersise2 extends JFrame {
 		btnInsert.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (txtItemValue.getText() == null || txtItemValue.getText().isBlank()) {
-					JOptionPane.showMessageDialog(null, "Cannot insert a blank value", "WARNING",
-							JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Cannot insert a blank value", "WARNING", JOptionPane.WARNING_MESSAGE);
 					return;
 				}
-				
+
 				if (itemsSource.contains(txtItemValue.getText())) {
 					JOptionPane.showMessageDialog(null, "The item: " + txtItemValue.getText() + " is exist!!!", "WARNING",
 							JOptionPane.WARNING_MESSAGE);
 					return;
 				}
-				
+
 				itemsSource.add(txtItemValue.getText());
 				listSource.setListData(itemsSource);
 			}
@@ -173,11 +172,10 @@ public class FormExcersise2 extends JFrame {
 				int indexListTargetSelected = listTarget.getSelectedIndex();
 
 				if (indexListTargetSelected < 0) {
-					JOptionPane.showMessageDialog(null, "Please select at least 1 row in target box", "WARNING",
-							JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Please select at least 1 row in target box", "WARNING", JOptionPane.WARNING_MESSAGE);
 					return;
 				}
-				
+
 				int[] selectedIndices = listTarget.getSelectedIndices();
 				int lengthSelected = selectedIndices.length;
 				int indexSelected = -1;
@@ -185,14 +183,14 @@ public class FormExcersise2 extends JFrame {
 				int[] newSelectedIndices = new int[selectedIndices.length];
 				int newIndex = -1;
 				int itemsLength = itemsTarget.size();
-				
+
 				for (int i = lengthSelected - 1; i >= 0; i--) {
 					indexSelected = selectedIndices[i];
 					if (indexSelected < itemsLength - 1) {
 						itemSelected = itemsTarget.get(indexSelected);
 						itemsTarget.removeElementAt(indexSelected);
 						itemsTarget.insertElementAt(itemSelected, indexSelected + 1);
-						
+
 						// update new selected index
 						newIndex = Math.min(itemsLength - 1, indexSelected + 1);
 						newSelectedIndices[i] = newIndex;
@@ -201,7 +199,7 @@ public class FormExcersise2 extends JFrame {
 					}
 				}
 				// Update selection
-		        listTarget.setSelectedIndices(newSelectedIndices);
+				listTarget.setSelectedIndices(newSelectedIndices);
 			}
 		});
 	}
@@ -212,34 +210,33 @@ public class FormExcersise2 extends JFrame {
 				int indexListTargetSelected = listTarget.getSelectedIndex();
 
 				if (indexListTargetSelected < 0) {
-					JOptionPane.showMessageDialog(null, "Please select at least 1 row in target box", "WARNING",
-							JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Please select at least 1 row in target box", "WARNING", JOptionPane.WARNING_MESSAGE);
 					return;
 				}
-				
+
 				int[] selectedIndices = listTarget.getSelectedIndices();
 				int lengthSelected = selectedIndices.length;
 				int indexSelected = -1;
 				String itemSelected = null;
 				int[] newSelectedIndices = new int[selectedIndices.length];
 				int newIndex = -1;
-				
+
 				for (int i = 0; i < lengthSelected; i++) {
 					indexSelected = selectedIndices[i];
 					if (indexSelected > 0) {
 						itemSelected = itemsTarget.get(indexSelected);
 						itemsTarget.removeElementAt(indexSelected);
 						itemsTarget.insertElementAt(itemSelected, indexSelected - 1);
-						
+
 						// update new selected index
 						newIndex = Math.max(0, indexSelected - 1);
 						newSelectedIndices[i] = newIndex;
 					}
 				}
-				
+
 				// Update selection
-		        listTarget.setSelectedIndices(newSelectedIndices);
-		        
+				listTarget.setSelectedIndices(newSelectedIndices);
+
 			}
 		});
 	}
@@ -250,8 +247,7 @@ public class FormExcersise2 extends JFrame {
 				int indexListTargetSelected = listTarget.getSelectedIndex();
 
 				if (indexListTargetSelected < 0) {
-					JOptionPane.showMessageDialog(null, "Please select at least 1 row in target box", "WARNING",
-							JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Please select at least 1 row in target box", "WARNING", JOptionPane.WARNING_MESSAGE);
 					return;
 				}
 
@@ -270,8 +266,7 @@ public class FormExcersise2 extends JFrame {
 				int indexListSourceSelected = listSource.getSelectedIndex();
 
 				if (indexListSourceSelected < 0) {
-					JOptionPane.showMessageDialog(null, "Please select at least 1 row in source box", "WARNING",
-							JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Please select at least 1 row in source box", "WARNING", JOptionPane.WARNING_MESSAGE);
 					return;
 				}
 

@@ -75,7 +75,7 @@ public class ImageCommonHandle {
 		}
 	}
 	
-	public void loadImageToLabel2(String imagePath, ImageLabelWithCircles labelLoadImage, JPanel panelLoadImage) {
+	public void loadImageToLabel2(String imagePath, JLabel labelLoadImage, JPanel panelLoadImage) {
 	    try {
 	        BufferedImage bufferedImage = ImageIO.read(new File(imagePath));
 	        if (bufferedImage == null) {

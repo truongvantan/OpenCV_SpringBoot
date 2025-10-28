@@ -85,7 +85,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 	private JLabel lbThermalImage;
 
 //	private JLabel lbLoadInputImage;
-	private ImageLabelWithCircles lbLoadInputImage;
+	private JLabel lbLoadInputImage;
 
 	private JPanel panelOutputImage;
 	private JLabel lbLoadOutputImage;
@@ -106,6 +106,8 @@ public class FormExtractEmbeddedImage extends JFrame {
 	private JLabel lbLocationThermalImage_2;
 	private JLabel lbLocationMaxTemperatureValue;
 	private JLabel lbLocationMinTemperatureValue;
+	private JLabel lbMeanTemperature;
+	private JLabel lbMeanTemperatureValue;
 
 //	public FormExtractEmbeddedImage() {
 //		initComponent();
@@ -134,7 +136,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 		}
 		this.setTitle("Extract Embedded Image");
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setBounds(100, 100, 1487, 622);
+		this.setBounds(100, 100, 1487, 661);
 		this.setLocationRelativeTo(null);
 
 		contentPane = new JPanel();
@@ -150,7 +152,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 		listModel = new DefaultListModel<>();
 
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(30, 62, 327, 480);
+		scrollPane.setBounds(30, 62, 327, 515);
 		contentPane.add(scrollPane);
 
 		listImage = new JList<>(listModel);
@@ -260,6 +262,16 @@ public class FormExtractEmbeddedImage extends JFrame {
 		lbLocationMinTemperatureValue.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lbLocationMinTemperatureValue.setBounds(716, 528, 78, 14);
 		contentPane.add(lbLocationMinTemperatureValue);
+		
+		lbMeanTemperature = new JLabel("Mean Temperature:");
+		lbMeanTemperature.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lbMeanTemperature.setBounds(446, 563, 129, 14);
+		contentPane.add(lbMeanTemperature);
+		
+		lbMeanTemperatureValue = new JLabel("");
+		lbMeanTemperatureValue.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		lbMeanTemperatureValue.setBounds(582, 563, 68, 14);
+		contentPane.add(lbMeanTemperatureValue);
 
 		// file chooser
 		jFileChooser = new JFileChooser();
@@ -270,8 +282,8 @@ public class FormExtractEmbeddedImage extends JFrame {
 
 	private void settingJFileChooser(JFileChooser fileChooser) {
 		FileFilter imageFileFilter = new FileNameExtensionFilter("Image files", ImageIO.getReaderFileSuffixes());
-		componentSettingCommon.settingJFileChooser(fileChooser, "Please select your images", JFileChooser.FILES_ONLY,
-				true, imageFileFilter, appConfiguration.getInitCurrentDirectoryFileChooser());
+		componentSettingCommon.settingJFileChooser(fileChooser, "Please select your images", JFileChooser.FILES_ONLY, true, imageFileFilter,
+				appConfiguration.getInitCurrentDirectoryFileChooser());
 	}
 
 	private void handleEvent() {
@@ -309,8 +321,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 				lbLocationEmbeddedImageValue.setVisible(true);
 				int x = e.getX();
 				int y = e.getY();
-				String locationValue = new StringBuffer("").append("(").append(x).append(",").append(y).append(")")
-						.toString();
+				String locationValue = new StringBuffer("").append("(").append(x).append(",").append(y).append(")").toString();
 				lbLocationEmbeddedImageValue.setText(locationValue);
 			}
 		});
@@ -327,8 +338,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 					int y = e.getY();
 
 					if (x >= 0 && y >= 0 && x < temperatureMap.cols() && y < temperatureMap.rows()) {
-						String locationValue = new StringBuffer("").append("(").append(x).append(",").append(y)
-								.append(")").toString();
+						String locationValue = new StringBuffer("").append("(").append(x).append(",").append(y).append(")").toString();
 
 						lbLocationThermalImageValue.setText(locationValue);
 
@@ -336,8 +346,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 						double temperatureAtLocation = temperatureMap.get(y, x)[0];
 //						double temperatureAtLocation = getTemperatureAtLocation(x, y, mapMetadataParams);
 
-						String temperatureValue = new StringBuffer("")
-								.append(String.format("%.2f", temperatureAtLocation)).append("°C").toString();
+						String temperatureValue = new StringBuffer("").append(String.format("%.2f", temperatureAtLocation)).append("°C").toString();
 
 						lbTemperatureValue.setText(temperatureValue);
 					}
@@ -388,8 +397,8 @@ public class FormExtractEmbeddedImage extends JFrame {
 				imageCommonHandle.loadImageToLabel2(pathImageSelected, lbLoadInputImage, panelInputImage);
 				lbLocationThermalImageValue.setVisible(true);
 
-				// get max, min temperature of raw thermal image
-				displayMinMaxTemperature();
+				// get max, min, mean temperature of raw thermal image
+				displayMinMaxMeanTemperature();
 
 				// show extracted embedded image
 //				showEmbeddedImage(pathImageSelected);
@@ -409,15 +418,14 @@ public class FormExtractEmbeddedImage extends JFrame {
 			if (embeddedFile.exists() && embeddedFile.length() > 0) {
 				Mat matEmbeddedImage = Imgcodecs.imread(embeddedImagePath, Imgcodecs.IMREAD_UNCHANGED);
 				Mat matVisionImage = getMatVisionImage(matEmbeddedImage, mapMetadataParams);
-				
+
 				imageCommonHandle.loadCVMatToLabel(matVisionImage, lbLoadOutputImage, panelOutputImage);
 				String visionImagePath = fileService.getOutputFilePath(pathImageSelected, "vision.png");
 				Imgcodecs.imwrite(visionImagePath, matVisionImage);
 			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Cannot extract embedded image: " + pathImageSelected, "WARNING",
-					JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Cannot extract embedded image: " + pathImageSelected, "WARNING", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		lbLocationEmbeddedImageValue.setVisible(true);
@@ -429,15 +437,10 @@ public class FormExtractEmbeddedImage extends JFrame {
 		double real2IR = flirMetadataParam.getReal2IR();
 		double offsetX = flirMetadataParam.getOffsetX();
 		double offsetY = flirMetadataParam.getOffsetY();
-		double pipX1 = flirMetadataParam.getPipX1();
-		double pipX2 = flirMetadataParam.getPipX2();
-		double pipY1 = flirMetadataParam.getPipY1();
-		double pipY2 = flirMetadataParam.getPipY2();
 		double rawThermalImageWidth = flirMetadataParam.getRawThermalImageWidth();
 		double rawThermalImageHeight = flirMetadataParam.getRawThermalImageHeight();
 
-		Mat imgScaled = new Mat((int) (matEmbeddedImage.rows() * real2IR), (int) (matEmbeddedImage.cols() * real2IR),
-				matEmbeddedImage.type());
+		Mat imgScaled = new Mat((int) (matEmbeddedImage.rows() * real2IR), (int) (matEmbeddedImage.cols() * real2IR), matEmbeddedImage.type());
 		Imgproc.resize(matEmbeddedImage, imgScaled, imgScaled.size(), 0, 0, Imgproc.INTER_LINEAR);
 		int width = (int) matEmbeddedImage.size().width;
 		int height = (int) matEmbeddedImage.size().height;
@@ -491,12 +494,10 @@ public class FormExtractEmbeddedImage extends JFrame {
 
 		switch (messageExtractRawThermalImageFile) {
 		case Constant.MESSAGE_EXTRACT_RAW_THERMAL_IMAGE_FILE_SUCCESS:
-			JOptionPane.showMessageDialog(null, messageExtractRawThermalImageFile, "INFO",
-					JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, messageExtractRawThermalImageFile, "INFO", JOptionPane.INFORMATION_MESSAGE);
 			break;
 		default:
-			JOptionPane.showMessageDialog(null, messageExtractRawThermalImageFile + pathImageSelected, "WARNING",
-					JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, messageExtractRawThermalImageFile + pathImageSelected, "WARNING", JOptionPane.WARNING_MESSAGE);
 			break;
 		}
 	}
@@ -510,8 +511,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 			JOptionPane.showMessageDialog(null, messageExtractMetadataFile, "INFO", JOptionPane.INFORMATION_MESSAGE);
 			break;
 		default:
-			JOptionPane.showMessageDialog(null, messageExtractMetadataFile + pathImageSelected, "WARNING",
-					JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, messageExtractMetadataFile + pathImageSelected, "WARNING", JOptionPane.WARNING_MESSAGE);
 			break;
 		}
 	}
@@ -522,12 +522,10 @@ public class FormExtractEmbeddedImage extends JFrame {
 
 		switch (messageExtractEmbeddedImageFile) {
 		case Constant.MESSAGE_EXTRACT_EMBEDDED_IMAGE_FILE_SUCCESS:
-			JOptionPane.showMessageDialog(null, messageExtractEmbeddedImageFile, "INFO",
-					JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, messageExtractEmbeddedImageFile, "INFO", JOptionPane.INFORMATION_MESSAGE);
 			break;
 		default:
-			JOptionPane.showMessageDialog(null, messageExtractEmbeddedImageFile, "INFO",
-					JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, messageExtractEmbeddedImageFile, "INFO", JOptionPane.INFORMATION_MESSAGE);
 			break;
 		}
 	}
@@ -542,8 +540,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Cannot extract embedded image: " + pathImageSelected, "WARNING",
-					JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Cannot extract embedded image: " + pathImageSelected, "WARNING", JOptionPane.WARNING_MESSAGE);
 		}
 		lbLocationEmbeddedImageValue.setVisible(true);
 	}
@@ -607,10 +604,10 @@ public class FormExtractEmbeddedImage extends JFrame {
 		flirMetadataParam = commonParseValue.parseMetadata(mapMetadataParams);
 
 		Mat raw16 = Imgcodecs.imread(rawThermalImageSelectedPath, Imgcodecs.IMREAD_ANYDEPTH);
+//		Mat raw16 = Imgcodecs.imread(rawThermalImageSelectedPath, Imgcodecs.IMREAD_UNCHANGED);
 
 		if (raw16.empty()) {
-			JOptionPane.showMessageDialog(null, "Cannot load thermal image: " + rawThermalImageSelectedPath, "WARNING",
-					JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Cannot load thermal image: " + rawThermalImageSelectedPath, "WARNING", JOptionPane.WARNING_MESSAGE);
 		}
 
 		raw16 = convertBigEndianToLittleEndian(raw16);
@@ -684,87 +681,95 @@ public class FormExtractEmbeddedImage extends JFrame {
 		double atmosphericTransBeta1 = flirMetadataParam.getAtmosphericTransBeta1(); // 0.003180;
 		double atmosphericTransBeta2 = flirMetadataParam.getAtmosphericTransBeta2(); // 0.003180;
 		double atmosphericTransX = flirMetadataParam.getAtmosphericTransX(); // 0.732000;
+		double emissWind = 1 - irWindowTransmission; //  Window emissivity
+		double reflectWind = 0.0; // anti-reflective coating on window
+		
+		// Link reference formula
+		// https://flir.custhelp.com/app/answers/detail/a_id/3321/~/flir-cameras---temperature-measurement-formula
+		// https://github.com/gtatters/Thermimage/blob/master/R/raw2temp.R
+		double h2o = 0.0; // water vapour pressure
+		h2o = (0.01 * relativeHumidity) * Math.exp(1.5587 + 0.06939 * atmosphericTemperature - 0.00027816 * Math.pow(atmosphericTemperature, 2)
+				+ 0.00000068455 * Math.pow(atmosphericTemperature, 3));
 
-		double emissWind = 1 - irWindowTransmission;
-		double reflectWind = 0;
-		double h2o = (relativeHumidity / 100) * Math.exp(1.5587 + 0.06939 * atmosphericTemperature
-				- 0.00027816 * Math.sqrt(atmosphericTemperature) + 0.00000068455 * Math.pow(atmosphericTemperature, 3));
-		double tau1 = atmosphericTransX
-				* Math.exp(-Math.sqrt(objectDistance / 2)
-						* (atmosphericTransAlpha1 + atmosphericTransBeta1 * Math.sqrt(h2o)))
-				+ (1 - atmosphericTransX) * Math.exp(-Math.sqrt(objectDistance / 2)
-						* (atmosphericTransAlpha2 + atmosphericTransBeta2 * Math.sqrt(h2o)));
-		double tau2 = atmosphericTransX
-				* Math.exp(-Math.sqrt(objectDistance / 2)
-						* (atmosphericTransAlpha1 + atmosphericTransBeta1 * Math.sqrt(h2o)))
-				+ (1 - atmosphericTransX) * Math.exp(-Math.sqrt(objectDistance / 2)
-						* (atmosphericTransAlpha2 + atmosphericTransBeta2 * Math.sqrt(h2o)));
+		// calculate atmospheric correction factor (tau). Transmission through atmosphere
+		double tau = atmosphericTransX * Math.exp(-Math.sqrt(objectDistance / 2) * (atmosphericTransAlpha1 + atmosphericTransBeta1 * Math.sqrt(h2o)))
+				+ (1 - atmosphericTransX)
+						* Math.exp(-Math.sqrt(objectDistance / 2) * (atmosphericTransAlpha2 + atmosphericTransBeta2 * Math.sqrt(h2o)));
+		
+		
+		// calculate radiance reflected by the surface. Radiance reflecting off the object before the window
+		double rawRefl1 = planckR1 / (planckR2 * (Math.exp(planckB / (reflectedApparentTemperature + Constant.ZERO_KELVIN)) - planckF)) - planckO;
+		
+		// calculate fraction of the thermal radiation flux incident on the sensor. Attenuated radiance reflecting off the object before the window
+		double rawRefl1Attn = (1 - emissivity) * rawRefl1 / emissivity;
+		
+		
+		// calculate radiance of the atmosphere. Radiance from the atmosphere before the window
+		double rawAtm1 = planckR1 / (planckR2 * (Math.exp(planckB / (atmosphericTemperature + Constant.ZERO_KELVIN)) - planckF)) - planckO;
 
-		// radiance reflecting off the object before the window
-		double rawRefl1 = planckR1
-				/ (planckR2 * (Math.exp(planckB / (reflectedApparentTemperature + 273.15)) - planckF)) - planckO;
+		/* 
+		 * calculate the fraction of the atmosphere’s thermal radiation of the radiation flux arriving at the sensor
+		 * Attenuated radiance from the atmosphere before the window
+		 * */
+		double rawAtm1Attn = ((1-tau) * rawAtm1) / (emissivity * tau);
+		
+		double rawWind = planckR1 / (planckR2 * (Math.exp(planckB / (irWindowTemperature + Constant.ZERO_KELVIN)) - planckF)) - planckO;
+		double rawWindAttn = (emissWind*rawWind) / (emissivity * tau * irWindowTransmission);
+		
+		double rawRefl2 = rawRefl1;
+		double rawRefl2Attn = (reflectWind * rawRefl2) / (emissivity * tau * irWindowTransmission);
+		
+		double rawAtm2 = rawAtm1;
+		double rawAtm2Attn = ((1-tau) * rawAtm2) / (emissivity * tau * tau * irWindowTransmission );
+		
+		// calculate the actual surface temperature (rawS) from the raw signal values
+		// rawVal
+		double rawObj = (rawVal) / (emissivity * tau * tau * irWindowTransmission) - rawAtm1Attn - rawAtm2Attn - rawWindAttn - rawRefl1Attn - rawRefl2Attn;
 
-		// attn = the attenuated radiance(in raw units). Infrared radiation is
-		// attenuated by the atmosphere
-		double rawRefl1Attn = (1 - emissivity) / emissivity * rawRefl1;
+		// calculate temperature surface in Celsius
+		double tempC = planckB / (Math.log(planckR1 / (planckR2 * (rawObj + planckO)) + planckF)) - Constant.ZERO_KELVIN;
 
-		// radiance from the atmosphere (before the window)
-		double rawAtm1 = planckR1 / (planckR2 * (Math.exp(planckB / (atmosphericTemperature + 273.15)) - planckF))
-				- planckO;
-		double rawAtm1Attn = (1 - tau1) / emissivity / tau1 * rawAtm1; // attn = the attenuated radiance(in raw units)
-
-		double rawWind = planckR1 / (planckR2 * (Math.exp(planckB / (irWindowTemperature + 273.15)) - planckF))
-				- planckO;
-		double rawWindAttn = emissWind / emissivity / tau1 / irWindowTransmission * rawWind;
-
-		double rawRefl2 = planckR1
-				/ (planckR2 * (Math.exp(planckB / (reflectedApparentTemperature + 273.15)) - planckF)) - planckO;
-		double rawRefl2Attn = reflectWind / emissivity / tau1 / irWindowTransmission * rawRefl2;
-
-		double rawAtm2 = planckR1 / (planckR2 * (Math.exp(planckB / (atmosphericTemperature + 273.15)) - planckF))
-				- planckO;
-		double rawAtm2Attn = (1 - tau2) / emissivity / tau1 / irWindowTransmission / tau2 * rawAtm2;
-
-		double rawObj = (rawVal / emissivity / tau1 / irWindowTransmission / tau2 - rawAtm1Attn - rawAtm2Attn
-				- rawWindAttn - rawRefl1Attn - rawRefl2Attn);
-
-		double tempCelsius = planckB / Math.log(planckR1 / (planckR2 * (rawObj + planckO)) + planckF) - 273.15;
-
-		return tempCelsius;
+		return tempC;
 
 	}
 
-	private void displayMinMaxTemperature() {
+	private void displayMinMaxMeanTemperature() {
 		Core.MinMaxLocResult minMax = Core.minMaxLoc(temperatureMap);
+		
+		// max temperature
 		double maxTemperature = minMax.maxVal;
-		double minTemperature = minMax.minVal;
-		String maxTemperatureValue = new StringBuffer("").append(String.format("%.2f", maxTemperature)).append("°C")
-				.toString();
-		String minTemperatureValue = new StringBuffer("").append(String.format("%.2f", minTemperature)).append("°C")
-				.toString();
-
+		String maxTemperatureValue = new StringBuffer("").append(String.format("%.2f", maxTemperature)).append("°C").toString();
 		lbMaxTemperatureValue.setText(maxTemperatureValue);
-		lbMinTemperatureValue.setText(minTemperatureValue);
-
+		
+		// location of max temperature
 		Point pointMaxTemperatureLocation = minMax.maxLoc;
 		int xLocationMaxTemperature = (int) pointMaxTemperatureLocation.x;
 		int yLocationMaxTemperature = (int) pointMaxTemperatureLocation.y;
-
+		String locationMaxTemperature = new StringBuffer("").append("(").append(xLocationMaxTemperature).append(",").append(yLocationMaxTemperature)
+				.append(")").toString();
+		lbLocationMaxTemperatureValue.setText(locationMaxTemperature);
+		
+		// min temperature
+		double minTemperature = minMax.minVal;
+		String minTemperatureValue = new StringBuffer("").append(String.format("%.2f", minTemperature)).append("°C").toString();
+		lbMinTemperatureValue.setText(minTemperatureValue);
+		
+		// location of min temperature
 		Point pointMinTemperatureLocation = minMax.minLoc;
 		int xLocationMinTemperature = (int) pointMinTemperatureLocation.x;
 		int yLocationMinTemperature = (int) pointMinTemperatureLocation.y;
-
-		String locationMaxTemperature = new StringBuffer("").append("(").append(xLocationMaxTemperature).append(",")
-				.append(yLocationMaxTemperature).append(")").toString();
-		String locationMinTemperature = new StringBuffer("").append("(").append(xLocationMinTemperature).append(",")
-				.append(yLocationMinTemperature).append(")").toString();
-
-		lbLocationMaxTemperatureValue.setText(locationMaxTemperature);
+		String locationMinTemperature = new StringBuffer("").append("(").append(xLocationMinTemperature).append(",").append(yLocationMinTemperature)
+				.append(")").toString();
 		lbLocationMinTemperatureValue.setText(locationMinTemperature);
-
-		lbLoadInputImage.setTemperaturePoints(xLocationMaxTemperature, yLocationMaxTemperature, xLocationMinTemperature,
-				yLocationMinTemperature);
+		
+		// mean temperature
+		Scalar meanScalar = Core.mean(temperatureMap);
+		double meanTemperature = meanScalar.val[0];
+		String meanTemperatureValue = new StringBuffer("").append(String.format("%.2f", meanTemperature)).append("°C").toString();
+		lbMeanTemperatureValue.setText(meanTemperatureValue);
+		
+		// draw circle mark max + min temperature location
+		((ImageLabelWithCircles) lbLoadInputImage).setTemperaturePoints(xLocationMaxTemperature, yLocationMaxTemperature, xLocationMinTemperature, yLocationMinTemperature);
 	}
-
 
 }

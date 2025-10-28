@@ -129,8 +129,7 @@ public class FormConvertImageExtension extends JFrame {
 
 		cbbImageExtension = new JComboBox<String>();
 		cbbImageExtension.setFont(new Font("Tahoma", Font.BOLD, 13));
-		cbbImageExtension.setModel(
-				new DefaultComboBoxModel<String>(new String[] {".jpg", ".png", ".tif", ".bmp", ".webp"}));
+		cbbImageExtension.setModel(new DefaultComboBoxModel<String>(new String[] { ".jpg", ".png", ".tif", ".bmp", ".webp" }));
 		cbbImageExtension.setSelectedIndex(0);
 		cbbImageExtension.setBounds(167, 507, 83, 22);
 		contentPane.add(cbbImageExtension);
@@ -157,8 +156,8 @@ public class FormConvertImageExtension extends JFrame {
 
 	private void settingFileChooser(JFileChooser fileChooser) {
 		FileFilter imageFileFilter = new FileNameExtensionFilter("Image files", ImageIO.getReaderFileSuffixes());
-		componentSettingCommon.settingJFileChooser(fileChooser, "Please select your images", JFileChooser.FILES_ONLY,
-				true, imageFileFilter, appConfiguration.getInitCurrentDirectoryFileChooser());
+		componentSettingCommon.settingJFileChooser(fileChooser, "Please select your images", JFileChooser.FILES_ONLY, true, imageFileFilter,
+				appConfiguration.getInitCurrentDirectoryFileChooser());
 	}
 
 	private void handleEvent() {
@@ -173,18 +172,15 @@ public class FormConvertImageExtension extends JFrame {
 				String fileNameExtensionSelected = (String) cbbImageExtension.getSelectedItem();
 
 				if (cbbImageExtension.getSelectedIndex() < 0 || fileNameExtensionSelected == null) {
-					JOptionPane.showMessageDialog(null, "Please select file name extension!!!", "WARNING",
-							JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Please select file name extension!!!", "WARNING", JOptionPane.WARNING_MESSAGE);
 				} else {
 					String pathImageSelected = listImage.getSelectedValue();
 					if (pathImageSelected == null || listImage.getSelectedIndex() < 0) {
-						JOptionPane.showMessageDialog(null, "Please select path image want to convert!!!", "WARNING",
-								JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(null, "Please select path image want to convert!!!", "WARNING", JOptionPane.WARNING_MESSAGE);
 					} else {
 						JFileChooser jFileChooser = new JFileChooser();
-						componentSettingCommon.settingJFileChooser(jFileChooser,
-								"Please select a folder to save your image", JFileChooser.DIRECTORIES_ONLY,
-								false, null, appConfiguration.getInitCurrentDirectoryFileChooser());
+						componentSettingCommon.settingJFileChooser(jFileChooser, "Please select a folder to save your image",
+								JFileChooser.DIRECTORIES_ONLY, false, null, appConfiguration.getInitCurrentDirectoryFileChooser());
 						String outputFolderPath = "";
 
 						if (jFileChooser.showOpenDialog(getOwner()) == JFileChooser.APPROVE_OPTION) {
@@ -193,29 +189,26 @@ public class FormConvertImageExtension extends JFrame {
 							// Format output file name
 							File inputFile = new File(pathImageSelected);
 							String baseName = inputFile.getName().replaceFirst("[.][^.]+$", ""); // remove extension
-							String outputImagePath = outputFolderPath + "\\" + baseName + "_converted"
-									+ fileNameExtensionSelected;
+							String outputImagePath = outputFolderPath + "\\" + baseName + "_converted" + fileNameExtensionSelected;
 
 							try {
 								Mat inputMat = Imgcodecs.imread(pathImageSelected);
 
 								if (inputMat.empty()) {
-									JOptionPane.showMessageDialog(null, "Cannot read image opencv", "WARNING",
-											JOptionPane.WARNING_MESSAGE);
+									JOptionPane.showMessageDialog(null, "Cannot read image opencv", "WARNING", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 
 								if (Imgcodecs.imwrite(outputImagePath, inputMat)) {
-									JOptionPane.showMessageDialog(null, "Convert image successfully", "INFO",
-											JOptionPane.INFORMATION_MESSAGE);
+									JOptionPane.showMessageDialog(null, "Convert image successfully", "INFO", JOptionPane.INFORMATION_MESSAGE);
 								} else {
-									JOptionPane.showMessageDialog(null, "Cannot convert image: " + outputImagePath,
-											"WARNING", JOptionPane.WARNING_MESSAGE);
+									JOptionPane.showMessageDialog(null, "Cannot convert image: " + outputImagePath, "WARNING",
+											JOptionPane.WARNING_MESSAGE);
 								}
 							} catch (CvException e1) {
 								e1.printStackTrace();
-								JOptionPane.showMessageDialog(null, "Cannot convert image: " + outputImagePath,
-										"WARNING", JOptionPane.WARNING_MESSAGE);
+								JOptionPane.showMessageDialog(null, "Cannot convert image: " + outputImagePath, "WARNING",
+										JOptionPane.WARNING_MESSAGE);
 							}
 						}
 					}

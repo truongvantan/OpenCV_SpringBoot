@@ -205,8 +205,8 @@ public class FormSVD extends JFrame {
 
 	private void settingJFileChooser(JFileChooser jFileChooser) {
 		FileFilter imageFileFilter = new FileNameExtensionFilter("Image files", ImageIO.getReaderFileSuffixes());
-		componentSettingCommon.settingJFileChooser(jFileChooser, "Please select your images", JFileChooser.FILES_ONLY,
-				true, imageFileFilter, appConfiguration.getInitCurrentDirectoryFileChooser());
+		componentSettingCommon.settingJFileChooser(jFileChooser, "Please select your images", JFileChooser.FILES_ONLY, true, imageFileFilter,
+				appConfiguration.getInitCurrentDirectoryFileChooser());
 	}
 
 	private void handleEvent() {
@@ -221,8 +221,7 @@ public class FormSVD extends JFrame {
 		btnProcessSVD.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (jListImage2.getSelectedIndex() < 0 || jListImage1.getSelectedIndex() < 0) {
-					JOptionPane.showMessageDialog(null, "Please select two image", "Warning",
-							JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Please select two image", "Warning", JOptionPane.WARNING_MESSAGE);
 					return;
 				} else {
 					processSVD();
@@ -244,7 +243,7 @@ public class FormSVD extends JFrame {
 
 		Imgproc.resize(image1, image1, new Size(400, 400));
 		Imgproc.resize(image2, image2, new Size(400, 400));
-		
+
 		if (image1.empty() || image2.empty()) {
 			JOptionPane.showMessageDialog(null, "Cannot read image with OpenCV", "Error", JOptionPane.ERROR_MESSAGE);
 			return;

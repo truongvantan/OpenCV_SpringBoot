@@ -28,6 +28,13 @@ public class ImageCommonHandle {
 		JLabel imageLabel = new JLabel(imageIcon);
 		panel.add(imageLabel);
 	}
+	
+	public void loadImageErrorToLabel(JLabel labelLoadImage, JPanel panelLoadImage) {
+		ImageIcon imageIcon = (ImageIcon) UIManager.getIcon("OptionPane.errorIcon");
+		imageIcon.setImage(imageIcon.getImage().getScaledInstance(panelLoadImage.getWidth(),
+				panelLoadImage.getHeight(), Image.SCALE_SMOOTH));
+		labelLoadImage.setIcon(imageIcon);
+	}
 
 	public void loadImageToLabel(String imagePath, JLabel labelLoadImage, JPanel panelLoadImage) {
 		BufferedImage bufferedImage = null;
@@ -75,7 +82,7 @@ public class ImageCommonHandle {
 		}
 	}
 	
-	public void loadImageToLabel2(String imagePath, JLabel labelLoadImage, JPanel panelLoadImage) {
+	public void loadImageFromPathToLabel(String imagePath, JLabel labelLoadImage, JPanel panelLoadImage) {
 	    try {
 	        BufferedImage bufferedImage = ImageIO.read(new File(imagePath));
 	        if (bufferedImage == null) {

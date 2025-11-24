@@ -48,10 +48,10 @@ import java.awt.Color;
 public class FormSVD extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	private final AppConfiguration appConfiguration;
+	
 	private ComponentSettingCommon componentSettingCommon = new ComponentSettingCommon();
 	private ImageCommonHandle imageCommonHandle = new ImageCommonHandle();
-
-	private final AppConfiguration appConfiguration;
 
 	private JPanel contentPane;
 	private JScrollPane scrollPane;
@@ -76,9 +76,6 @@ public class FormSVD extends JFrame {
 	private Vector<String> listItemJListImage2;
 	private JButton btnProcessSVD;
 
-//	public FormSVD() {
-//		initComponent();
-//	}
 
 	public FormSVD(AppConfiguration appConfiguration) throws HeadlessException {
 		this.appConfiguration = appConfiguration;
@@ -238,9 +235,6 @@ public class FormSVD extends JFrame {
 		Mat image2 = Imgcodecs.imread(path2, Imgcodecs.IMREAD_COLOR);
 
 		// resize
-//		Imgproc.resize(image1, image1, new Size(panelOriginalImage1.getWidth(), panelOriginalImage1.getHeight()));
-//		Imgproc.resize(image2, image2, new Size(panelOriginalImage1.getWidth(), panelOriginalImage1.getHeight()));
-
 		Imgproc.resize(image1, image1, new Size(400, 400));
 		Imgproc.resize(image2, image2, new Size(400, 400));
 
@@ -254,6 +248,10 @@ public class FormSVD extends JFrame {
 		Mat rgbImage2 = new Mat();
 		Imgproc.cvtColor(image1, rgbImage1, Imgproc.COLOR_BGR2RGB);
 		Imgproc.cvtColor(image2, rgbImage2, Imgproc.COLOR_BGR2RGB);
+
+		// Process the images
+		processImagesWithSVD(rgbImage1, rgbImage2);
+		
 
 		// Process the images
 		processImagesWithSVD(rgbImage1, rgbImage2);

@@ -46,9 +46,6 @@ public class FormConvertImageExtension extends JFrame {
 
 	private final AppConfiguration appConfiguration;
 
-//	@Value("${init.current.directory.file.chooser}")
-//	private String INIT_CURRENT_DIRECTORY_FILE_CHOOSER;
-
 	private ImageCommonHandle imageCommonHandle = new ImageCommonHandle();
 	private ComponentSettingCommon componentSettingCommon = new ComponentSettingCommon();
 
@@ -65,10 +62,6 @@ public class FormConvertImageExtension extends JFrame {
 	private JButton btnConvert;
 //	private JnaFileChooser fileChooser;
 	private JFileChooser jFileChooser;
-
-//	public FormConvertImageExtension() {
-//		initComponent();
-//	}
 
 	@Autowired
 	public FormConvertImageExtension(AppConfiguration appConfiguration) throws HeadlessException {

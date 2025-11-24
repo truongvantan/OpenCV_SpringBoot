@@ -6,8 +6,8 @@ public class FlirMetadataParam {
 	private double objectDistance = 1.0;
 	private double atmosphericTemperature = 23.0, reflectedApparentTemperature = 20.0, relativeHumidity = 50.0;
 	private double irWindowTemperature = 20.0, irWindowTransmission = 1.0;
-	private double atmosphericTransAlpha1, atmosphericTransAlpha2, atmosphericTransBeta1 = 0.003180,
-			atmosphericTransBeta2 = 0.003180, atmosphericTransX = 0.732000;
+	private double atmosphericTransAlpha1, atmosphericTransAlpha2, atmosphericTransBeta1 = 0.003180, atmosphericTransBeta2 = 0.003180,
+			atmosphericTransX = 0.732000;
 	private double tau, R;
 
 	private double cameraTemperatureRangeMin = -20.0;
@@ -24,6 +24,8 @@ public class FlirMetadataParam {
 	private double pipY2 = 768;
 	private double rawThermalImageWidth = 464.0;
 	private double rawThermalImageHeight = 348.0;
+	private double embeddedImageWidth = 1280.0;
+	private double embeddedImageHeight = 960;
 
 	public FlirMetadataParam() {
 	}
@@ -284,22 +286,35 @@ public class FlirMetadataParam {
 		this.rawThermalImageHeight = rawThermalImageHeight;
 	}
 
+	public double getEmbeddedImageWidth() {
+		return embeddedImageWidth;
+	}
+
+	public void setEmbeddedImageWidth(double embeddedImageWidth) {
+		this.embeddedImageWidth = embeddedImageWidth;
+	}
+
+	public double getEmbeddedImageHeight() {
+		return embeddedImageHeight;
+	}
+
+	public void setEmbeddedImageHeight(double embeddedImageHeight) {
+		this.embeddedImageHeight = embeddedImageHeight;
+	}
+
 	@Override
 	public String toString() {
-		return "FlirMetadataParam [planckR1=" + planckR1 + ", planckB=" + planckB + ", planckF=" + planckF
-				+ ", planckO=" + planckO + ", planckR2=" + planckR2 + ", emissivity=" + emissivity + ", objectDistance="
-				+ objectDistance + ", atmosphericTemperature=" + atmosphericTemperature
-				+ ", reflectedApparentTemperature=" + reflectedApparentTemperature + ", relativeHumidity="
-				+ relativeHumidity + ", irWindowTemperature=" + irWindowTemperature + ", irWindowTransmission="
-				+ irWindowTransmission + ", atmosphericTransAlpha1=" + atmosphericTransAlpha1
-				+ ", atmosphericTransAlpha2=" + atmosphericTransAlpha2 + ", atmosphericTransBeta1="
-				+ atmosphericTransBeta1 + ", atmosphericTransBeta2=" + atmosphericTransBeta2 + ", atmosphericTransX="
-				+ atmosphericTransX + ", tau=" + tau + ", R=" + R + ", cameraTemperatureRangeMin="
-				+ cameraTemperatureRangeMin + ", cameraTemperatureRangeMax=" + cameraTemperatureRangeMax
-				+ ", rawValueRangeMin=" + rawValueRangeMin + ", rawValueRangeMax=" + rawValueRangeMax + ", real2IR="
-				+ real2IR + ", offsetX=" + offsetX + ", offsetY=" + offsetY + ", pipX1=" + pipX1 + ", pipX2=" + pipX2
-				+ ", pipY1=" + pipY1 + ", pipY2=" + pipY2 + ", rawThermalImageWidth=" + rawThermalImageWidth
-				+ ", rawThermalImageHeight=" + rawThermalImageHeight + "]";
+		return "FlirMetadataParam [planckR1=" + planckR1 + ", planckB=" + planckB + ", planckF=" + planckF + ", planckO=" + planckO + ", planckR2="
+				+ planckR2 + ", emissivity=" + emissivity + ", objectDistance=" + objectDistance + ", atmosphericTemperature="
+				+ atmosphericTemperature + ", reflectedApparentTemperature=" + reflectedApparentTemperature + ", relativeHumidity=" + relativeHumidity
+				+ ", irWindowTemperature=" + irWindowTemperature + ", irWindowTransmission=" + irWindowTransmission + ", atmosphericTransAlpha1="
+				+ atmosphericTransAlpha1 + ", atmosphericTransAlpha2=" + atmosphericTransAlpha2 + ", atmosphericTransBeta1=" + atmosphericTransBeta1
+				+ ", atmosphericTransBeta2=" + atmosphericTransBeta2 + ", atmosphericTransX=" + atmosphericTransX + ", tau=" + tau + ", R=" + R
+				+ ", cameraTemperatureRangeMin=" + cameraTemperatureRangeMin + ", cameraTemperatureRangeMax=" + cameraTemperatureRangeMax
+				+ ", rawValueRangeMin=" + rawValueRangeMin + ", rawValueRangeMax=" + rawValueRangeMax + ", real2IR=" + real2IR + ", offsetX="
+				+ offsetX + ", offsetY=" + offsetY + ", pipX1=" + pipX1 + ", pipX2=" + pipX2 + ", pipY1=" + pipY1 + ", pipY2=" + pipY2
+				+ ", rawThermalImageWidth=" + rawThermalImageWidth + ", rawThermalImageHeight=" + rawThermalImageHeight + ", embeddedImageWidth="
+				+ embeddedImageWidth + ", embeddedImageHeight=" + embeddedImageHeight + "]";
 	}
 
 }

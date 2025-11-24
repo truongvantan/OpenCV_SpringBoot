@@ -24,8 +24,24 @@ public class AppConfiguration {
 		this.env = env;
 	}
 	
+	public String getOutputRootEmbeddedFileFolder() {
+		return env.getProperty("output.root.embedded.file.folder");
+	}
+	
+	public String getOutputMetadataFolder() {
+		return env.getProperty("output.metadata.folder");
+	}
+	
 	public String getOutputEmbeddedImageFolder() {
 		return env.getProperty("output.embedded.image.folder");
+	}
+	
+	public String getOutputVisionImageFolder() {
+		return env.getProperty("output.vision.image.folder");
+	}
+	
+	public String getOutputRawThermalImageFolder() {
+		return env.getProperty("output.raw.thermal.image.folder");
 	}
 	
 	public String getInitCurrentDirectoryFileChooser() {

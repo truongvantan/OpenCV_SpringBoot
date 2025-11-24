@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import com.tvt.config.AppConfiguration;
 import com.tvt.form.digital_communication.FormExcersise2;
 import com.tvt.form.digital_communication.FormSVD;
+import com.tvt.form.digital_communication.FormSVDCustomFilter;
 import com.tvt.form.image_processing.FormAccessPixelValueDemo;
 import com.tvt.form.image_processing.FormConvertImageExtension;
 import com.tvt.form.image_processing.FormExtractEmbeddedImage;
@@ -35,6 +36,7 @@ public class MainForm extends JFrame {
 	private final FormAccessPixelValueDemo formAccessPixelValueDemo;
 	private final FormExcersise2 formExcersise2;
 	private final FormSVD formSVD;
+	private final FormSVDCustomFilter formSVDCustomFilter;
 
 	private JMenuBar menuBar;
 	private JMenu mnOpenCVDemo;
@@ -44,22 +46,21 @@ public class MainForm extends JFrame {
 	private JMenu mnExcersises;
 	private JMenuItem menuItemExcersise2;
 	private JMenuItem mntmSVD;
-
-//	public MainForm() {
-//		initComponent();
-//	}
-
+	private JMenuItem mntmSVDCustomFilter;
+	
 	@Autowired
 	public MainForm(AppConfiguration appConfiguration, FormExtractEmbeddedImage formExtractEmbeddedImage,
 			FormConvertImageExtension formConvertImageExtension, FormAccessPixelValueDemo formAccessPixelValueDemo, FormExcersise2 formExcersise2,
-			FormSVD formSVD) throws HeadlessException {
+			FormSVD formSVD, FormSVDCustomFilter formSVDCustomFilter) throws HeadlessException {
+		
 		this.appConfiguration = appConfiguration;
 		this.formExtractEmbeddedImage = formExtractEmbeddedImage;
 		this.formConvertImageExtension = formConvertImageExtension;
 		this.formAccessPixelValueDemo = formAccessPixelValueDemo;
 		this.formExcersise2 = formExcersise2;
 		this.formSVD = formSVD;
-
+		this.formSVDCustomFilter = formSVDCustomFilter;
+		
 		initComponent();
 	}
 
@@ -107,6 +108,9 @@ public class MainForm extends JFrame {
 		mntmSVD = new JMenuItem("SVD");
 
 		mnExcersises.add(mntmSVD);
+		
+		mntmSVDCustomFilter = new JMenuItem("SVD Custom Filter");
+		mnExcersises.add(mntmSVDCustomFilter);
 
 		handleEvent();
 	}
@@ -117,6 +121,15 @@ public class MainForm extends JFrame {
 		menuItemConvertImageExtension_Click();
 		menuItemExcersise2_Click();
 		mntmSVD_Click();
+		mntmSVDCustomFilter_Click();
+	}
+
+	private void mntmSVDCustomFilter_Click() {
+		mntmSVDCustomFilter.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				formSVDCustomFilter.setVisible(true);
+			}
+		});
 	}
 
 	private void mntmSVD_Click() {

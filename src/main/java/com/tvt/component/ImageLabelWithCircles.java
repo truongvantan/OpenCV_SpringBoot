@@ -16,14 +16,14 @@ public class ImageLabelWithCircles extends JLabel {
 	private Integer xMinTemp = null;
 	private Integer yMinTemp = null;
 
-	private final int circleRadius = 6; // pixels
+	private final int circleRadius = 10; // pixels
 
 	public ImageLabelWithCircles() {
 		super();
 		setOpaque(true);
 	}
 
-	// Allow setting the circle positions dynamically
+	// Setting the circle positions
 	public void setTemperaturePoints(Integer xMax, Integer yMax, Integer xMin, Integer yMin) {
 		this.xMaxTemp = xMax;
 		this.yMaxTemp = yMax;

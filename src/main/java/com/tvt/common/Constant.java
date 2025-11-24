@@ -1,7 +1,7 @@
 package com.tvt.common;
 
 public class Constant {
-	public static final String MESSAGE_EXTRACT_METADATA_FILE_SUCCESS = "Extract metdata file successfully";
+	public static final String MESSAGE_EXTRACT_METADATA_FILE_SUCCESS = "Extract metadata file successfully";
 	public static final String MESSAGE_EXTRACT_METADATA_FILE_FAIL = "Cannot extract metadata file";
 	
 	public static final String MESSAGE_EXTRACT_EMBEDDED_IMAGE_FILE_SUCCESS = "Extract embedded image file successfully";

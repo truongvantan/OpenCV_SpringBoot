@@ -44,10 +44,6 @@ public class FormExcersise2 extends JFrame {
 	private JTextField txtItemValue;
 	private JButton btnInsert;
 
-//	public FormExcersise2() {
-//		initComponent();
-//	}
-
 	@Autowired
 	public FormExcersise2(AppConfiguration appConfiguration) throws HeadlessException {
 		this.appConfiguration = appConfiguration;

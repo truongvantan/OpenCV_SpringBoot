@@ -7,10 +7,10 @@ public class CommonParseValue {
 	public CommonParseValue() {
 	}
 
-	public double getDouble(Map<String, String> map, String key, double def) {
+	public double getDouble(Map<String, String> map, String key, double defaultValue) {
 		String v = map.get(key);
 		if (v == null) {
-			return def;
+			return defaultValue;
 		}
 		v = v.replaceAll("[^0-9.\\-eE+]", "");
 
@@ -18,7 +18,7 @@ public class CommonParseValue {
 			return Double.parseDouble(v);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
-			return def;
+			return defaultValue;
 		}
 
 	}
@@ -89,6 +89,8 @@ public class CommonParseValue {
 		m.setPipY2(getDouble(map, "PiP Y2"));
 		m.setRawThermalImageWidth(getDouble(map, "Raw Thermal Image Width"));
 		m.setRawThermalImageHeight(getDouble(map, "Raw Thermal Image Height"));
+		m.setEmbeddedImageWidth(getDouble(map, "Embedded Image Width"));
+		m.setEmbeddedImageHeight(getDouble(map, "Embedded Image Height"));
 		
 		return m;
 	}

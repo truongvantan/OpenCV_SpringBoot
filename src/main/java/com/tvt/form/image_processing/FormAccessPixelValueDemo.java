@@ -43,9 +43,6 @@ public class FormAccessPixelValueDemo extends JFrame {
 
 	private final AppConfiguration appConfiguration;
 
-//	@Value("${init.current.directory.file.chooser}")
-//	private String INIT_CURRENT_DIRECTORY_FILE_CHOOSER;
-
 	private ImageCommonHandle imageCommonHandle = new ImageCommonHandle();
 	private ComponentSettingCommon componentSettingCommon = new ComponentSettingCommon();
 
@@ -61,10 +58,6 @@ public class FormAccessPixelValueDemo extends JFrame {
 	private JLabel lbLoadOutputImage;
 	private JLabel lbOutputImage;
 	private JButton btnClear;
-
-//	public FormAccessPixelValueDemo() {
-//		initComponent();
-//	}
 
 	@Autowired
 	public FormAccessPixelValueDemo(AppConfiguration appConfiguration) throws HeadlessException {

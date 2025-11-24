@@ -3,9 +3,8 @@ package com.tvt.common;
 import java.io.File;
 
 import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
-
-import org.opencv.imgcodecs.Imgcodecs;
 
 public class ComponentSettingCommon {
 	public ComponentSettingCommon() {
@@ -26,7 +25,12 @@ public class ComponentSettingCommon {
 				fileChooser.setFileFilter(fileFilter);
 			}
 			
-			fileChooser.setCurrentDirectory(new File(currentDirectoryPath));
+			SwingUtilities.invokeLater(new Runnable() {
+			    public void run() {
+			        fileChooser.setCurrentDirectory(new File(currentDirectoryPath));
+			    }
+			});
+			
 			
 		}
 	}

@@ -102,12 +102,14 @@ public class FileService {
 		File folder = new File(outputFolderEmbedded);
 
 		if (!folder.exists()) {
-			boolean created = folder.mkdirs(); // Use mkdirs() to create parent directories if needed
+			boolean created = folder.mkdirs();
+			
 			if (created) {
 				System.out.println("Folder created successfully: " + outputFolderEmbedded);
 			} else {
 				System.err.println("Failed to create folder: " + outputFolderEmbedded);
 			}
+			
 		} else {
 			System.err.println("Folder already exists: " + outputFolderEmbedded);
 		}

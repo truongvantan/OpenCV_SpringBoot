@@ -14,7 +14,9 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,6 +26,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.BevelBorder;
@@ -100,6 +104,9 @@ public class FormExtractEmbeddedImage extends JFrame {
 	private JLabel lbMeanTemperatureValue;
 	private JButton btnSelectOutputFolder;
 	private JTextField txtOutputFolderEmbeddedFilePath;
+	private JPanel panelOutputTemperatureImage;
+	private JLabel lbLoadOutputTemperatureImage;
+	private JLabel lblTemperatureImage;
 
 	@Autowired
 	public FormExtractEmbeddedImage(AppConfiguration appConfiguration) throws HeadlessException {
@@ -124,7 +131,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 		}
 		this.setTitle("Extract Embedded Image");
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setBounds(100, 100, 1957, 871);
+		this.setBounds(100, 100, 1957, 1333);
 		this.setLocationRelativeTo(null);
 
 		contentPane = new JPanel();
@@ -137,7 +144,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 		contentPane.add(btnLoadImage);
 
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(30, 62, 327, 520);
+		scrollPane.setBounds(30, 62, 327, 1221);
 		contentPane.add(scrollPane);
 
 		listImageData = new Vector<>();
@@ -161,13 +168,13 @@ public class FormExtractEmbeddedImage extends JFrame {
 
 		lbThermalImage = new JLabel("Thermal Image");
 		lbThermalImage.setFont(new Font("Tahoma", Font.BOLD, 13));
-		lbThermalImage.setBounds(446, 62, 95, 14);
+		lbThermalImage.setBounds(446, 75, 95, 14);
 		contentPane.add(lbThermalImage);
 
 		panelOutputVisionImage = new JPanel();
 		panelOutputVisionImage.setLayout(null);
 		panelOutputVisionImage.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		panelOutputVisionImage.setBounds(1239, 102, 640, 480);
+		panelOutputVisionImage.setBounds(1239, 100, 640, 480);
 		contentPane.add(panelOutputVisionImage);
 
 		lbLoadOutputVisionImage = new JLabel("");
@@ -176,7 +183,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 
 		lbOutputImage = new JLabel("Vision Image");
 		lbOutputImage.setFont(new Font("Tahoma", Font.BOLD, 13));
-		lbOutputImage.setBounds(1239, 62, 119, 14);
+		lbOutputImage.setBounds(1240, 75, 119, 14);
 		contentPane.add(lbOutputImage);
 
 		lbLocationThermalImage = new JLabel("Location:");
@@ -266,14 +273,30 @@ public class FormExtractEmbeddedImage extends JFrame {
 		btnSelectOutputFolder.setFont(new Font("Tahoma", Font.BOLD, 11));
 		btnSelectOutputFolder.setBorderPainted(false);
 		btnSelectOutputFolder.setBackground(new Color(0, 128, 0));
-		btnSelectOutputFolder.setBounds(182, 13, 160, 36);
+		btnSelectOutputFolder.setBounds(197, 13, 160, 36);
 		contentPane.add(btnSelectOutputFolder);
 
 		txtOutputFolderEmbeddedFilePath = new JTextField();
+		txtOutputFolderEmbeddedFilePath.setFont(new Font("Tahoma", Font.BOLD, 13));
 		txtOutputFolderEmbeddedFilePath.setEditable(false);
-		txtOutputFolderEmbeddedFilePath.setBounds(352, 21, 280, 20);
+		txtOutputFolderEmbeddedFilePath.setBounds(367, 15, 370, 32);
 		contentPane.add(txtOutputFolderEmbeddedFilePath);
 		txtOutputFolderEmbeddedFilePath.setColumns(10);
+
+		panelOutputTemperatureImage = new JPanel();
+		panelOutputTemperatureImage.setLayout(null);
+		panelOutputTemperatureImage.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		panelOutputTemperatureImage.setBounds(533, 803, 640, 480);
+		contentPane.add(panelOutputTemperatureImage);
+
+		lbLoadOutputTemperatureImage = new JLabel("");
+		lbLoadOutputTemperatureImage.setBounds(0, 0, 640, 480);
+		panelOutputTemperatureImage.add(lbLoadOutputTemperatureImage);
+
+		lblTemperatureImage = new JLabel("Temperature Image");
+		lblTemperatureImage.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lblTemperatureImage.setBounds(531, 778, 146, 14);
+		contentPane.add(lblTemperatureImage);
 
 		// file chooser
 		jFileChooser = new JFileChooser();
@@ -294,50 +317,27 @@ public class FormExtractEmbeddedImage extends JFrame {
 		lbLoadInputImage_MouseExited();
 		lbLoadOutputImage_MouseMoved();
 		lbLoadOutputImage_MouseExited();
-//		btnExtractAll_Click();
 		btnSelectOutputFolder_Click();
 	}
 
 	private void btnSelectOutputFolder_Click() {
 		btnSelectOutputFolder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
 				JFileChooser jFileChooser = new JFileChooser();
 				componentSettingCommon.settingJFileChooser(jFileChooser, "Please select a folder to save your image", JFileChooser.DIRECTORIES_ONLY,
 						false, null, appConfiguration.getInitCurrentDirectoryFileChooser());
 
 				if (jFileChooser.showOpenDialog(getOwner()) == JFileChooser.APPROVE_OPTION) {
+					listImage.clearSelection();
 					String outputFolderEmbedded = jFileChooser.getSelectedFile().getAbsolutePath();
-
 					txtOutputFolderEmbeddedFilePath.setText(outputFolderEmbedded);
+					listImageData.clear();
+					listImage.setListData(listImageData);
 				}
 			}
 		});
 	}
-
-//	private void btnExtractAll_Click() {
-//		btnExtractAll.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				if (listImageData == null || listImageData.size() == 0) {
-//					JOptionPane.showMessageDialog(null, "Empty list image!!!", "WARNING", JOptionPane.WARNING_MESSAGE);
-//					return;
-//				}
-//
-//				if (txtOutputFolderEmbeddedFilePath == null || txtOutputFolderEmbeddedFilePath.getText() == null
-//						|| txtOutputFolderEmbeddedFilePath.getText().isBlank()) {
-//					JOptionPane.showMessageDialog(null, "Please select the output folder to store the data!!!", "WARNING",
-//							JOptionPane.WARNING_MESSAGE);
-//					return;
-//				}
-//
-//				for (String imagePath : listImageData) {
-//					extractAllEmbeddedFile(imagePath, txtOutputFolderEmbeddedFilePath.getText());
-//				}
-//
-//				JOptionPane.showMessageDialog(null, "Extract embedded file successfully", "INFO", JOptionPane.INFORMATION_MESSAGE);
-//
-//			}
-//		});
-//	}
 
 	private void lbLoadInputImage_MouseExited() {
 		lbLoadInputImage.addMouseListener(new MouseAdapter() {
@@ -398,38 +398,112 @@ public class FormExtractEmbeddedImage extends JFrame {
 
 		});
 	}
-	
-    private String removeChineseCharacters(String inputString) {
-        return inputString.replaceAll("[\\u4E00-\\u9FA5]", "");
-    }
+
+	private String removeChineseCharacters(String inputString) {
+		return inputString.replaceAll("[\\u4E00-\\u9FA5]", "");
+	}
+
+	private JDialog createLoadingDialog() {
+	    JDialog dialog = new JDialog(FormExtractEmbeddedImage.this, "Processing...", true);
+	    dialog.setSize(300, 300);
+	    dialog.setLocationRelativeTo(FormExtractEmbeddedImage.this);
+	    dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+	    dialog.setResizable(false);
+
+	    ImageIcon loadingIcon = new ImageIcon(
+	        FormExtractEmbeddedImage.class.getResource("/loading.gif")
+	    );
+
+	    JLabel lblGif = new JLabel(loadingIcon, SwingConstants.CENTER);
+	    dialog.add(lblGif);
+
+	    return dialog;
+	}
+
 
 	private void btnLoadImage_Click() {
 		btnLoadImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
 				if (txtOutputFolderEmbeddedFilePath == null || txtOutputFolderEmbeddedFilePath.getText() == null
 						|| txtOutputFolderEmbeddedFilePath.getText().isBlank()) {
 					JOptionPane.showMessageDialog(null, "Please select the output folder to store the data!!!", "WARNING",
 							JOptionPane.WARNING_MESSAGE);
 					return;
 				}
-				
+
 				listImageData.clear();
-				
+
 				if (jFileChooser.showOpenDialog(getOwner()) == JFileChooser.APPROVE_OPTION) {
-					File[] selectedFiles = jFileChooser.getSelectedFiles();
-					String cleanPath = "";
-					for (File file : selectedFiles) {
-//						cleanPath = removeChineseCharacters(file.getAbsolutePath());
-//						listImageData.add(cleanPath);
-						listImageData.add(file.getAbsolutePath());
-						extractAllEmbeddedFile(file.getAbsolutePath(), txtOutputFolderEmbeddedFilePath.getText());
-					}
+					// Create loading dialog
+					JDialog loadingDialog = createLoadingDialog();
+
+					// Disable FormExtractEmbeddedImage frame
+					FormExtractEmbeddedImage.this.setEnabled(false);
 					
-					listImage.setListData(listImageData);
+					// Create worker to handle event
+					SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+
+						@Override
+						protected Void doInBackground() throws Exception {
+							listImage.clearSelection();
+							File[] selectedFiles = jFileChooser.getSelectedFiles();
+							for (File file : selectedFiles) {
+								listImageData.add(file.getAbsolutePath());
+								extractAllEmbeddedFile(file.getAbsolutePath(), txtOutputFolderEmbeddedFilePath.getText());
+							}
+							return null;
+						}
+
+						@Override
+						protected void done() {
+							loadingDialog.dispose(); // Dispose loading
+							FormExtractEmbeddedImage.this.setEnabled(true); // Enable FormExtractEmbeddedImage frame again
+							listImage.setListData(listImageData);
+							JOptionPane.showMessageDialog(null, "Extract embedded file successfully", "INFO", JOptionPane.INFORMATION_MESSAGE);
+						}
+					};
+
+					// Execute worker
+					worker.execute();
+					loadingDialog.setVisible(true);
 				}
 			}
 		});
 	}
+
+//	private void btnLoadImage_Click() {
+//		btnLoadImage.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				
+//				if (txtOutputFolderEmbeddedFilePath == null || txtOutputFolderEmbeddedFilePath.getText() == null
+//						|| txtOutputFolderEmbeddedFilePath.getText().isBlank()) {
+//					JOptionPane.showMessageDialog(null, "Please select the output folder to store the data!!!", "WARNING",
+//							JOptionPane.WARNING_MESSAGE);
+//					return;
+//				}
+//				
+//				listImageData.clear();
+//				
+//				if (jFileChooser.showOpenDialog(getOwner()) == JFileChooser.APPROVE_OPTION) {
+//					listImage.clearSelection();
+//					File[] selectedFiles = jFileChooser.getSelectedFiles();
+//					String cleanPath = "";
+//					for (File file : selectedFiles) {
+////						cleanPath = removeChineseCharacters(file.getAbsolutePath());
+////						listImageData.add(cleanPath);
+//						listImageData.add(file.getAbsolutePath());
+//						extractAllEmbeddedFile(file.getAbsolutePath(), txtOutputFolderEmbeddedFilePath.getText());
+//					}
+//					
+//					listImage.setListData(listImageData);
+//					JOptionPane.showMessageDialog(null, "Extract embedded file successfully", "INFO",
+//							JOptionPane.INFORMATION_MESSAGE);
+//					
+//				}
+//			}
+//		});
+//	}
 
 	private void listImage_ValueChanged() {
 		listImage.addListSelectionListener(new ListSelectionListener() {
@@ -442,7 +516,9 @@ public class FormExtractEmbeddedImage extends JFrame {
 				}
 
 				String pathImageSelected = listImage.getSelectedValue();
-				displayResult(pathImageSelected);
+				if (pathImageSelected != null && !pathImageSelected.isBlank()) {
+					displayResult(pathImageSelected);
+				}
 			}
 
 		});
@@ -455,7 +531,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 
 		// get temperature map of raw thermal image
 		temperatureMap = getTemperatureMap(mapMetadataParams, pathImageSelected);
-		
+
 		// load thermal image to label
 		imageCommonHandle.loadImageFromPathToLabel(pathImageSelected, lbLoadInputImage, panelInputImage);
 		lbLocationThermalImageValue.setVisible(true);
@@ -482,7 +558,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 
 		// extract raw thermal image
 		extractRawThermalImageOfThermalImage(pathImageSelected, outputFolderEmbedded);
-		
+
 		// extract vision image
 		extractVisionImageOfThermalImage(pathImageSelected, outputFolderEmbedded);
 
@@ -491,19 +567,19 @@ public class FormExtractEmbeddedImage extends JFrame {
 	private void extractVisionImageOfThermalImage(String pathImageSelected, String outputFolderEmbedded) {
 		String embeddedImagePath = fileService.getOutputFilePath(pathImageSelected, "embedded.png", txtOutputFolderEmbeddedFilePath.getText());
 		String metadataFilePath = fileService.getOutputFilePath(pathImageSelected, "metadata.txt", txtOutputFolderEmbeddedFilePath.getText());
-		
+
 		if (metadataFilePath == null) {
 			System.err.println("Cannot extract metadata file of: " + pathImageSelected);
 			return;
 		}
-		
+
 		if (embeddedImagePath == null) {
 			System.err.println("Cannot extract embedded image at: " + pathImageSelected);
 			return;
 		}
-		
+
 		fileService.createOutputDirectory(outputFolderEmbedded + "\\Vision");
-		
+
 		mapMetadataParams = fileService.readFlirMetadataParams(metadataFilePath);
 		try {
 			File embeddedFile = new File(embeddedImagePath);
@@ -520,7 +596,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 			System.err.println("Cannot extract vision image at: " + pathImageSelected);
 			return;
 		}
-		
+
 	}
 
 	private Mat getMatVisionImage(Mat matEmbeddedImage, Map<String, String> mapMetadataParams) {
@@ -531,17 +607,11 @@ public class FormExtractEmbeddedImage extends JFrame {
 		double offsetY = flirMetadataParam.getOffsetY();
 		double rawThermalImageWidth = flirMetadataParam.getRawThermalImageWidth();
 		double rawThermalImageHeight = flirMetadataParam.getRawThermalImageHeight();
-		double embeddedImageWidth = flirMetadataParam.getEmbeddedImageWidth();
-		double embeddedImageHeight = flirMetadataParam.getEmbeddedImageHeight();
-		double pipX1 = flirMetadataParam.getPipX1();
-		double pipX2 = flirMetadataParam.getPipX2();
-		double pipY1 = flirMetadataParam.getPipY1();
-		double pipY2 = flirMetadataParam.getPipY2();
 
 		int origHeight = matEmbeddedImage.rows();
 		int origWidth = matEmbeddedImage.cols();
 
-		// Step 1: Scale embedded image by Real_2_IR
+		// Scale embedded image by Real 2 IR parameter
 		int scaledHeight = (int) (origHeight * real2IR);
 		int scaledWidth = (int) (origWidth * real2IR);
 
@@ -586,23 +656,25 @@ public class FormExtractEmbeddedImage extends JFrame {
 		Mat imgVision = new Mat((int) rawThermalImageHeight, (int) rawThermalImageWidth, matEmbeddedImage.type());
 		Imgproc.resize(imgCropped, imgVision, imgVision.size(), 0, 0, Imgproc.INTER_LINEAR);
 
-		// shift left 13 pixel
-		int shiftX = -13;
-		int shiftY = 0;
+		return imgVision;
 
-		// Create 2x3 translation matrix
-		Mat translationMatrix = new Mat(2, 3, CvType.CV_32F);
-		translationMatrix.put(0, 0, 1);
-		translationMatrix.put(0, 1, 0);
-		translationMatrix.put(0, 2, shiftX);
-		translationMatrix.put(1, 0, 0);
-		translationMatrix.put(1, 1, 1);
-		translationMatrix.put(1, 2, shiftY);
-
-		Mat imageVisionshifted = new Mat();
-		Imgproc.warpAffine(imgVision, imageVisionshifted, translationMatrix, imgVision.size(), Imgproc.INTER_LINEAR, Core.BORDER_REPLICATE);
-
-		return imageVisionshifted;
+//		// shift left 13 pixel
+//		int shiftX = -13;
+//		int shiftY = 0;
+//
+//		// Create 2x3 translation matrix
+//		Mat translationMatrix = new Mat(2, 3, CvType.CV_32F);
+//		translationMatrix.put(0, 0, 1);
+//		translationMatrix.put(0, 1, 0);
+//		translationMatrix.put(0, 2, shiftX);
+//		translationMatrix.put(1, 0, 0);
+//		translationMatrix.put(1, 1, 1);
+//		translationMatrix.put(1, 2, shiftY);
+//
+//		Mat imageVisionshifted = new Mat();
+//		Imgproc.warpAffine(imgVision, imageVisionshifted, translationMatrix, imgVision.size(), Imgproc.INTER_LINEAR, Core.BORDER_REPLICATE);
+//
+//		return imageVisionshifted;
 
 	}
 
@@ -619,7 +691,7 @@ public class FormExtractEmbeddedImage extends JFrame {
 			break;
 		}
 	}
-	
+
 	private void extractMetadataOfThermalImage(String pathImageSelected, String outputFolderEmbedded) {
 		String messageExtractMetadataFile = null;
 		messageExtractMetadataFile = fileService.extractMetadataFile(pathImageSelected, outputFolderEmbedded);
@@ -835,5 +907,11 @@ public class FormExtractEmbeddedImage extends JFrame {
 		// draw circle mark max + min temperature location
 		((ImageLabelWithCircles) lbLoadInputImage).setTemperaturePoints(xLocationMaxTemperature, yLocationMaxTemperature, xLocationMinTemperature,
 				yLocationMinTemperature);
+
+		// Load temperature map to temperature image
+		Mat temperatureMapDisplay = new Mat();
+		Core.normalize(temperatureMap, temperatureMapDisplay, 0, 255, Core.NORM_MINMAX);
+		temperatureMapDisplay.convertTo(temperatureMapDisplay, CvType.CV_8U);
+		imageCommonHandle.loadCVMatToLabel(temperatureMapDisplay, lbLoadOutputTemperatureImage, panelOutputTemperatureImage);
 	}
 }

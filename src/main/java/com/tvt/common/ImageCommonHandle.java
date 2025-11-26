@@ -15,6 +15,7 @@ import javax.swing.UIManager;
 
 import org.opencv.core.Mat;
 import org.opencv.highgui.HighGui;
+import org.opencv.imgproc.Imgproc;
 
 import com.tvt.component.ImageLabelWithCircles;
 
@@ -69,6 +70,10 @@ public class ImageCommonHandle {
 	}
 
 	public void loadCVMatToLabel(Mat mat, JLabel labelLoadImage, JPanel panelLoadImage) {
+		if (mat.channels() == 1) {
+		    Imgproc.cvtColor(mat, mat, Imgproc.COLOR_GRAY2BGR);
+		}
+		
 		BufferedImage bufferedImage = (BufferedImage) HighGui.toBufferedImage(mat);
 
 		ImageIcon imageIcon = new ImageIcon(bufferedImage);

@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -46,6 +43,9 @@ public class FileService {
 					.toString();
 		case "vision.png":
 			return new StringBuffer("").append(outputFolderEmbedded).append("\\Vision").append("\\").append(baseName).append("_vision.png")
+					.toString();
+		case "vision_detected.png":
+			return new StringBuffer("").append(outputFolderEmbedded).append("\\Vision_Detected").append("\\").append(baseName).append("_vision_detected.png")
 					.toString();
 		case "raw_thermal_little_endian.png":
 			return new StringBuffer("").append(outputFolderEmbedded).append("\\Raw_Thermal").append("\\").append(baseName)
@@ -100,7 +100,7 @@ public class FileService {
 
 	public void createOutputDirectory(String outputFolderEmbedded) {
 		File folder = new File(outputFolderEmbedded);
-
+		
 		if (!folder.exists()) {
 			boolean created = folder.mkdirs();
 			

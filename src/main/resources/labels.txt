@@ -1,0 +1,7 @@
+Fuse
+MCB
+MCCB
+PSU
+RCCB
+SLB
+Socket
